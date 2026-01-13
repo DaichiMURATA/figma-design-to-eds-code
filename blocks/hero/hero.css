@@ -10,15 +10,34 @@
   max-width: 100%;
   margin: 0;
   padding: var(--spacing-scale-64, 64px) var(--spacing-xl, 32px);
-  background-color: var(--color-neutral-900, #1a1a1a);
+  background: linear-gradient(45deg, #ff0844, #ffb199);
   background-image: url('./hero-background.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  min-height: 480px;
+  background-blend-mode: multiply;
+  min-height: 600px;
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.5) 0%, rgba(102, 126, 234, 0.5) 100%);
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
 }
 
 /* Hero Row */
@@ -28,6 +47,9 @@
   gap: var(--spacing-l, 24px);
   max-width: var(--layout-constraint-content-max, 1200px);
   width: 100%;
+  position: relative;
+  z-index: 1;
+  text-align: center;
 }
 
 /* Hero Text Content */
@@ -46,10 +68,27 @@
   margin: 0;
   padding-bottom: var(--spacing-scale-48, 48px);
   font-family: var(--font-family-body, 'Noto Sans JP', sans-serif);
-  font-size: var(--typography-heading-40-size, 40px);
+  font-size: 64px;
   font-weight: var(--typography-weight-bold, 700);
-  line-height: 64px; /* Fixed: Figma value is 64px, not variable */
-  color: var(--color-neutral-0, #ffffff);
+  line-height: 64px;
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
+               0 0 40px rgba(255, 107, 107, 0.6),
+               4px 4px 8px rgba(0, 0, 0, 0.5);
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { 
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
+                 0 0 40px rgba(255, 107, 107, 0.6),
+                 4px 4px 8px rgba(0, 0, 0, 0.5);
+  }
+  50% { 
+    text-shadow: 0 0 30px rgba(255, 255, 255, 1),
+                 0 0 60px rgba(255, 107, 107, 1),
+                 4px 4px 8px rgba(0, 0, 0, 0.5);
+  }
 }
 
 /* Hero Body Text */
