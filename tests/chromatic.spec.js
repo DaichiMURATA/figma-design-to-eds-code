@@ -46,7 +46,7 @@ test.describe('figma-design-to-eds-code Visual Regression', () => {
           navigationOptions.waitUntil = 'networkidle';
         }
         
-        await page.goto(pageConfig.path, navigationOptions);
+        await page.goto(fullUrl, navigationOptions);
         
         // 追加の待機時間
         if (pageConfig.additionalWaitTime) {
