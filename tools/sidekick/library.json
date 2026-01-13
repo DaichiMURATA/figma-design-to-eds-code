@@ -1,0 +1,84 @@
+{
+  "blocks": [
+    {
+      "name": "Accordion",
+      "path": "/blocks/accordion",
+      "image": ""
+    },
+    {
+      "name": "Breadcrumb",
+      "path": "/blocks/breadcrumb",
+      "image": ""
+    },
+    {
+      "name": "Cards",
+      "path": "/blocks/cards",
+      "image": ""
+    },
+    {
+      "name": "Carousel",
+      "path": "/blocks/carousel",
+      "image": ""
+    },
+    {
+      "name": "Code",
+      "path": "/blocks/code",
+      "image": ""
+    },
+    {
+      "name": "Columns",
+      "path": "/blocks/columns",
+      "image": ""
+    },
+    {
+      "name": "Embed",
+      "path": "/blocks/embed",
+      "image": ""
+    },
+    {
+      "name": "Footer",
+      "path": "/blocks/footer",
+      "image": ""
+    },
+    {
+      "name": "Fragment",
+      "path": "/blocks/fragment",
+      "image": ""
+    },
+    {
+      "name": "Header",
+      "path": "/blocks/header",
+      "image": ""
+    },
+    {
+      "name": "Hero",
+      "path": "/blocks/hero",
+      "image": ""
+    },
+    {
+      "name": "Quote",
+      "path": "/blocks/quote",
+      "image": ""
+    },
+    {
+      "name": "Search",
+      "path": "/blocks/search",
+      "image": ""
+    },
+    {
+      "name": "Section Metadata",
+      "path": "/blocks/section-metadata",
+      "image": ""
+    },
+    {
+      "name": "Table",
+      "path": "/blocks/table",
+      "image": ""
+    },
+    {
+      "name": "Tabs",
+      "path": "/blocks/tabs",
+      "image": ""
+    }
+  ]
+}
