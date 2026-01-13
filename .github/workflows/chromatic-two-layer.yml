@@ -80,23 +80,25 @@ jobs:
           BUILD_NUMBER=$(grep -oP '(?:Build|build) \K\d+' chromatic-storybook-output.txt | head -1 || echo "")
           STORY_COUNT=$(grep -oP 'tested \K\d+(?= stor)' chromatic-storybook-output.txt | head -1 || echo "0")
           
+          # Extract full Chromatic URL directly from CLI output
+          # Pattern: "View build details at https://www.chromatic.com/build?appId=...&number=..."
+          BUILD_URL=$(grep -oP 'View build details at \Khttps://[^\s]+' chromatic-storybook-output.txt | head -1 || echo "")
+          
           # Debug: Show extracted values
           echo "DEBUG: BUILD_NUMBER='$BUILD_NUMBER'"
-          echo "DEBUG: APP_ID='$CHROMATIC_APP_ID'"
+          echo "DEBUG: BUILD_URL='$BUILD_URL'"
           
-          # Construct Chromatic build URL
-          if [ -n "$BUILD_NUMBER" ]; then
-            BUILD_URL="https://www.chromatic.com/build?appId=${CHROMATIC_APP_ID}&number=${BUILD_NUMBER}"
+          # Set outputs
+          if [ -n "$BUILD_URL" ]; then
             echo "build_number=${BUILD_NUMBER}" >> $GITHUB_OUTPUT
             echo "chromatic_url=${BUILD_URL}" >> $GITHUB_OUTPUT
             echo "story_count=${STORY_COUNT}" >> $GITHUB_OUTPUT
             echo "✅ Chromatic Build #${BUILD_NUMBER}: ${BUILD_URL}"
           else
-            BUILD_URL="https://www.chromatic.com/builds?appId=${CHROMATIC_APP_ID}"
-            echo "chromatic_url=${BUILD_URL}" >> $GITHUB_OUTPUT
-            echo "build_number=" >> $GITHUB_OUTPUT
+            echo "build_number=${BUILD_NUMBER}" >> $GITHUB_OUTPUT
+            echo "chromatic_url=" >> $GITHUB_OUTPUT
             echo "story_count=${STORY_COUNT}" >> $GITHUB_OUTPUT
-            echo "⚠️ Could not extract build number"
+            echo "⚠️ Could not extract Chromatic URL from output"
           fi
       
       - name: Upload Chromatic output
@@ -202,19 +204,23 @@ jobs:
           # Extract build number from Chromatic output
           BUILD_NUMBER=$(grep -oP '(?:Build|build) \K\d+' chromatic-output.txt | head -1 || echo "")
           
+          # Extract full Chromatic URL directly from CLI output
+          # Pattern: "View build details at https://www.chromatic.com/build?appId=...&number=..."
+          BUILD_URL=$(grep -oP 'View build details at \Khttps://[^\s]+' chromatic-output.txt | head -1 || echo "")
+          
           # Debug: Show extracted values
           echo "DEBUG: BUILD_NUMBER='$BUILD_NUMBER'"
-          echo "DEBUG: APP_ID='$CHROMATIC_APP_ID'"
+          echo "DEBUG: BUILD_URL='$BUILD_URL'"
           
-          # Construct Chromatic build URL
-          if [ -n "$BUILD_NUMBER" ]; then
-            BUILD_URL="https://www.chromatic.com/build?appId=${CHROMATIC_APP_ID}&number=${BUILD_NUMBER}"
-          else
-            BUILD_URL="https://www.chromatic.com/builds?appId=${CHROMATIC_APP_ID}"
-          fi
-          
+          # Set outputs
           echo "chromatic_url=${BUILD_URL}" >> $GITHUB_OUTPUT
           echo "build_number=${BUILD_NUMBER}" >> $GITHUB_OUTPUT
+          
+          if [ -n "$BUILD_URL" ]; then
+            echo "✅ Chromatic Build #${BUILD_NUMBER}: ${BUILD_URL}"
+          else
+            echo "⚠️ Could not extract Chromatic URL from output"
+          fi
       
       - name: Upload test results
         uses: actions/upload-artifact@v4
