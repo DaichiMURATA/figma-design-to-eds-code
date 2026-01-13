@@ -20,16 +20,17 @@
 .cards > ul > li.card {
   display: flex;
   flex-direction: column;
-  background-color: var(--color-neutral-0, #ffffff);
-  border: 1px solid var(--color-neutral-200, #e5e5e5);
-  border-radius: var(--size-radius-8, 8px);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: 3px solid #ff6b6b;
+  border-radius: var(--size-radius-8, 16px);
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
 }
 
 .cards > ul > li.card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5);
+  transform: translateY(-4px) scale(1.02);
 }
 
 /* Card Image */
@@ -49,16 +50,19 @@
 /* Card Content */
 .card-title {
   margin: var(--spacing-m, 16px) var(--spacing-m, 16px) 0;
-  font-size: var(--typography-body-22-size, 22px);
+  font-size: 28px;
   font-weight: var(--font-weight-bold, 700);
-  color: var(--color-neutral-900, #1a1a1a);
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
 }
 
 .card-body {
   margin: var(--spacing-s, 12px) var(--spacing-m, 16px);
-  color: var(--color-neutral-700, #4a4a4a);
-  line-height: 1.6;
+  color: #f0f0f0;
+  line-height: 1.8;
   flex-grow: 1;
+  font-size: 16px;
 }
 
 .card-cta {
@@ -67,17 +71,21 @@
 
 .card-cta a {
   display: inline-block;
-  padding: var(--spacing-s, 12px) var(--spacing-l, 24px);
-  background-color: var(--color-primary-500, #0078d4);
-  color: var(--color-neutral-0, #ffffff);
+  padding: 14px 32px;
+  background-color: #feca57;
+  color: #2d3436;
   text-decoration: none;
   border-radius: var(--size-radius-30, 30px);
   font-weight: var(--font-weight-bold, 700);
-  transition: background-color 0.2s ease;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(254, 202, 87, 0.5);
 }
 
 .card-cta a:hover {
-  background-color: var(--color-primary-600, #005a9e);
+  background-color: #fdcb6e;
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(254, 202, 87, 0.7);
 }
 
 .card-cta a:focus-visible {
