@@ -132,7 +132,8 @@ jobs:
     
     env:
       # EDS URL Pattern: https://{branch}--figma-design-to-eds-code--daichimurata.aem.live/
-      SOURCE_URL: https://${{ github.head_ref || github.ref_name }}--figma-design-to-eds-code--daichimurata.aem.live
+      # Add cache busting parameter to ensure fresh content
+      SOURCE_URL: https://${{ github.head_ref || github.ref_name }}--figma-design-to-eds-code--daichimurata.aem.live?cache=bust
       TARGET_URL: https://${{ github.base_ref || 'main' }}--figma-design-to-eds-code--daichimurata.aem.live
     
     steps:
