@@ -3,6 +3,8 @@ name: "Chromatic Two-Layer Visual Testing"
 on:
   pull_request:
     branches: [ main, develop ]
+  push:
+    branches: [ main ]
   workflow_dispatch:
     inputs:
       test_layer:
@@ -56,10 +58,19 @@ jobs:
         id: chromatic
         run: |
           echo "📤 Publishing Storybook to Chromatic..."
+          
+          # Add --auto-accept-changes for main branch pushes
+          AUTO_ACCEPT=""
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            AUTO_ACCEPT="--auto-accept-changes"
+            echo "🔄 Main branch push detected - will auto-accept changes as new baseline"
+          fi
+          
           npx chromatic \
             --project-token=${{ secrets.CHROMATIC_STORYBOOK_TOKEN }} \
             --storybook-build-dir=storybook-static \
-            --only-changed > chromatic-storybook-output.txt 2>&1 || true
+            --only-changed \
+            $AUTO_ACCEPT > chromatic-storybook-output.txt 2>&1 || true
           
           # Display output
           cat chromatic-storybook-output.txt
@@ -168,7 +179,18 @@ jobs:
           CHROMATIC_PLAYWRIGHT_TOKEN: ${{ secrets.CHROMATIC_PLAYWRIGHT_TOKEN }}
         run: |
           echo "📤 Uploading to Chromatic..."
-          npm run chromatic:playwright > chromatic-output.txt 2>&1 || true
+          
+          # Add --auto-accept-changes for main branch pushes
+          AUTO_ACCEPT=""
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            AUTO_ACCEPT="--auto-accept-changes"
+            echo "🔄 Main branch push detected - will auto-accept changes as new baseline"
+          fi
+          
+          npx chromatic \
+            --playwright \
+            --project-token=${{ secrets.CHROMATIC_PLAYWRIGHT_TOKEN }} \
+            $AUTO_ACCEPT > chromatic-output.txt 2>&1 || true
           
           # Extract build number from Chromatic output
           BUILD_NUMBER=$(grep -oP '(?:Build|build) \K\d+' chromatic-output.txt | head -1 || echo "")
