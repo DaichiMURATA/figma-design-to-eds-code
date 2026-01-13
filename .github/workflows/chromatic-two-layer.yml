@@ -56,7 +56,7 @@ jobs:
       - name: Run Chromatic (Storybook - Changed Blocks Only)
         id: chromatic
         env:
-          CHROMATIC_APP_ID: ${{ secrets.CHROMATIC_STORYBOOK_APP_ID }}
+          CHROMATIC_APP_ID: ${{ vars.CHROMATIC_STORYBOOK_APP_ID }}
         run: |
           echo "📤 Publishing Storybook to Chromatic..."
           
@@ -190,7 +190,7 @@ jobs:
         if: always() && steps.tests.outcome == 'success'
         env:
           CHROMATIC_PLAYWRIGHT_TOKEN: ${{ secrets.CHROMATIC_PLAYWRIGHT_TOKEN }}
-          CHROMATIC_APP_ID: ${{ secrets.CHROMATIC_PLAYWRIGHT_APP_ID }}
+          CHROMATIC_APP_ID: ${{ vars.CHROMATIC_PLAYWRIGHT_APP_ID }}
         run: |
           echo "📤 Uploading to Chromatic..."
           
