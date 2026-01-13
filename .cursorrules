@@ -1,0 +1,225 @@
+# EDS Block Generation Rules - Figma MCP Integration Template
+
+## Automated Block Generation with Figma MCP
+
+When the user requests to generate a block, use the following workflow:
+
+### 1. User Input Options
+
+**Option A: Figma Only (Simplest)**
+```
+@figma https://www.figma.com/design/MJTwyRbE5EVdlci3UIwsut/...?node-id=2-1446
+
+Generate EDS Block for "Accordion"
+```
+- Extract all requirements from Figma design
+- Component name, variants, design tokens, layout structure
+- Infer accessibility requirements from component structure
+
+**Option B: Figma + User Story (Recommended for complex blocks)**
+```
+"Generate hero block:
+- Figma: https://www.figma.com/design/MJTwyRbE5EVdlci3UIwsut/...?node-id=2-1446
+- User Story: docs/user-stories/hero-block.md"
+```
+- Figma provides visual design and variants
+- User Story provides detailed functional and accessibility requirements
+
+**Option C: Template-style Request**
+```
+@figma https://www.figma.com/design/...?node-id=XXX
+@file docs/user-stories/hero-block.md  # Optional
+
+Generate EDS Block
+```
+
+### 2. Automatic Processing
+
+When user provides inputs:
+- Access Figma design via MCP `@figma` integration
+- Read User Story markdown file
+- Extract block name from User Story or Figma component name
+- Read `.cursorrules`, `BLOCK-GENERATION-GUIDE.md`, `VISUAL-REGRESSION-STRATEGY.md`
+- Generate block files directly
+
+### 3. Generation Steps
+
+**Parse User Input:**
+- Figma URL (required): Extract from `@figma` or prompt
+- User Story path (optional): Path to markdown file, if provided
+- Block name (optional): Auto-detect from Figma component name or files
+
+**Information Extraction:**
+
+From Figma (via MCP) - Always:
+- Component name and Variants
+- Design tokens (colors, typography, spacing)
+- Layout structure and dimensions
+- Interactive elements and states
+- Infer interaction behavior from component structure
+
+From User Story (markdown) - If provided:
+- Detailed functional requirements
+- Specific interaction requirements  
+- Edge case handling
+- Custom accessibility requirements
+- Specific test scenarios
+
+**When User Story is NOT provided:**
+- Infer requirements from Figma component structure
+- Use EDS Block Collection patterns (https://github.com/adobe/aem-block-collection)
+- Reference Adobe's standard block implementations
+- Apply default accessibility standards (WCAG AA)
+- Generate test scenarios based on Figma Variants
+
+**Code Generation:**
+1. Read project context from `BLOCK-GENERATION-GUIDE.md`
+2. Read Visual Regression strategy from `VISUAL-REGRESSION-STRATEGY.md`
+3. Reference EDS Block Collection for standard patterns:
+   - Accordion: https://github.com/adobe/aem-block-collection/tree/main/blocks/accordion
+   - Tabs: https://github.com/adobe/aem-block-collection/tree/main/blocks/tabs
+   - Carousel: https://github.com/adobe/aem-block-collection/tree/main/blocks/carousel
+   - Cards: https://github.com/adobe/aem-block-collection/tree/main/blocks/cards
+4. Check available design tokens (styles/*.css)
+5. Generate the three files directly:
+   - `blocks/<name>/<name>.js`
+   - `blocks/<name>/<name>.css`
+   - `blocks/<name>/<name>.stories.js`
+
+### 4. STORYBOOK STORY GENERATION STRATEGY
+
+**CRITICAL**: Figma is the Single Source of Truth
+
+**Story Generation Rule:**
+```
+Figma Variants count = Storybook Stories count (1:1 mapping)
+```
+
+**What to Generate:**
+- ✅ **One Story per Figma Variant** - No more, no less
+- ✅ **Story names match Figma Variant property values**
+- ✅ **All visual states must be defined in Figma as Variants**
+
+**What NOT to Generate:**
+- ❌ Do NOT add extra stories for edge cases (minimal/maximum content)
+- ❌ Do NOT add extra stories for interaction states (hover/focus/active) unless in Figma
+- ❌ Do NOT add extra stories for responsive breakpoints unless in Figma
+- ❌ Do NOT add extra stories for error/loading/empty states unless in Figma
+
+**Figma Design Requirements** (Designer responsibility):
+Each Figma Component Set should include Variants for:
+- All interaction states (default, hover, focus, active, disabled)
+- All content states (error, loading, empty) if applicable
+- All responsive breakpoints (desktop, tablet, mobile) if needed
+- All content variations (minimal, normal, maximum) if needed
+
+**Note:** If Figma lacks certain variants (e.g., focus state), this indicates the design needs to be updated in Figma first, NOT added in code generation.
+
+**Visual Regression Coverage:**
+- Each Story export → One Chromatic snapshot
+- Chromatic captures screenshots of all Story exports
+- Use `parameters.chromatic.viewports: [375, 1200]` for responsive testing within a single Story
+
+### 5. Example User Commands
+
+**Format 1: Figma Only (Simplest)**
+```
+@figma https://www.figma.com/design/ABC123/Components?node-id=100-200
+
+Generate EDS Block for "Accordion"
+```
+
+**Format 2: Figma Only with Block Name**
+```
+@figma https://www.figma.com/design/ABC123/Components?node-id=100-200
+
+Generate EDS Block for "Hero" with variants: Default, Centered, FullWidth
+```
+
+**Format 3: Figma + User Story (Recommended for complex blocks)**
+```
+"Generate tabs block:
+- Figma: https://www.figma.com/design/ABC123/Components?node-id=100-200
+- User Story: docs/user-stories/tabs-block.md"
+```
+
+**Format 4: Template with @figma**
+```
+@figma https://www.figma.com/design/ABC123/Components?node-id=100-200
+@file docs/user-stories/tabs-block.md  # Optional
+
+Generate EDS Block
+```
+
+### 6. Files to Read (In Order of Priority)
+
+1. **Figma design** (via MCP) - REQUIRED - Visual design and variants
+2. **User Story markdown** (if provided) - OPTIONAL - Detailed requirements and test scenarios
+3. **BLOCK-GENERATION-GUIDE.md** - REQUIRED - Comprehensive block generation rules (PRIMARY REFERENCE)
+4. **VISUAL-REGRESSION-STRATEGY.md** - REQUIRED - Storybook story strategy for Chromatic
+5. **EDS Block Collection** - REQUIRED - Adobe's standard block implementations
+   - GitHub: https://github.com/adobe/aem-block-collection
+   - Use as pattern reference for standard blocks (Accordion, Tabs, Carousel, Cards, etc.)
+6. **Style tokens** (styles/*.css) - Available design tokens
+7. **scripts/aem.js** - Available helper functions
+
+**When User Story is not provided:**
+- Rely on Figma design for all visual and structural requirements
+- Infer behavior from EDS Block Collection standard patterns
+- Map component name to standard EDS block type:
+  - Accordion → Standard expand/collapse pattern
+  - Tabs → Standard tab switching pattern
+  - Carousel → Standard slideshow pattern
+  - Hero → Standard hero section pattern
+- Apply standard accessibility patterns (WCAG AA) for component type
+- Reference AEM.live documentation: https://www.aem.live/docs/
+
+### 7. Post-Generation Steps
+
+Automatically remind user:
+1. Review generated files
+2. Run Storybook locally: `npm run storybook`
+3. Verify Visual Regression stories cover all Figma variants
+4. Test accessibility and responsiveness
+5. Create PR for Chromatic Visual Regression testing
+
+## No Manual Copy-Paste Required
+
+The AI should automatically handle:
+- Accessing Figma design via MCP
+- Reading User Story markdown
+- Applying generation rules from guides
+- Generating all block files (JS, CSS, Stories)
+- Providing next steps
+
+Just provide Figma URL and User Story path!
+
+## Project Context
+
+This is a **template project** for EDS Block generation with:
+- **Figma MCP Integration**: Direct access to Figma designs
+- **Two-Layer Visual Regression**: Chromatic + Storybook (Layer 1) + Playwright (Layer 2)
+- **Automated Workflow**: PR-based visual testing with GitHub Actions
+- **Quality Standards**: AA accessibility, Lighthouse 100, production-ready code
+
+## Quick Reference
+
+**Generate Block:**
+```
+@figma {FIGMA_URL}
+@file {USER_STORY_PATH}
+
+Generate EDS Block
+```
+
+**Update Design Tokens:**
+```
+@figma {FIGMA_URL}
+
+Extract Variables and update styles/styles.css
+```
+
+**View Documentation:**
+- BLOCK-GENERATION-GUIDE.md - Block generation rules
+- VISUAL-REGRESSION-STRATEGY.md - Story strategy for Chromatic
+- FIGMA-MCP-INTEGRATION.md - Figma MCP setup and usage

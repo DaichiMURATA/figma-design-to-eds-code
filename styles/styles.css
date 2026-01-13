@@ -10,6 +10,9 @@
  * governing permissions and limitations under the License.
  */
 
+/* Import Figma Design Tokens */
+@import url('./design-tokens.css');
+
 :root {
   /* colors */
   --background-color: white;

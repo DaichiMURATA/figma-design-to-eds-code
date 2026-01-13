@@ -1,33 +1,43 @@
-.columns > div {
+/**
+ * @file columns.css
+ * @description Styles for the Columns block
+ * @version 1.0.0
+ */
+
+.columns {
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-l, 24px);
+  margin: var(--spacing-xl, 32px) 0;
 }
 
-.columns img {
+.column {
+  flex: 1;
+}
+
+.column img {
   width: 100%;
-}
-
-.columns > div > div {
-  order: 1;
-}
-
-.columns > div > .columns-img-col {
-  order: 0;
-}
-
-.columns > div > .columns-img-col img {
+  height: auto;
   display: block;
 }
 
-@media (width >= 900px) {
-  .columns > div {
-    align-items: center;
-    flex-direction: unset;
-    gap: 24px;
+/* Desktop - Side by side */
+@media (min-width: 900px) {
+  .columns {
+    flex-direction: row;
+    gap: var(--spacing-xl, 32px);
+    margin: var(--spacing-scale-64, 64px) 0;
   }
+}
 
-  .columns > div > div {
-    flex: 1;
-    order: unset;
+/* Tablet */
+@media (min-width: 600px) and (max-width: 899px) {
+  .columns.columns-2 {
+    flex-direction: row;
+  }
+  
+  .columns.columns-3 .column:first-child,
+  .columns.columns-3 .column:nth-child(2) {
+    flex: 0 0 calc(50% - var(--spacing-l, 24px) / 2);
   }
 }

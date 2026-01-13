@@ -1,18 +1,31 @@
-export default function decorate(block) {
-  const cols = [...block.firstElementChild.children];
-  block.classList.add(`columns-${cols.length}-cols`);
+/**
+ * @file columns.js
+ * @description Columns block - Multi-column layout
+ * @version 1.0.0
+ */
 
-  // setup image columns
-  [...block.children].forEach((row) => {
-    [...row.children].forEach((col) => {
-      const pic = col.querySelector('picture');
-      if (pic) {
-        const picWrapper = pic.closest('div');
-        if (picWrapper && picWrapper.children.length === 1) {
-          // picture is only content in column
-          picWrapper.classList.add('columns-img-col');
-        }
+export default function decorate(block) {
+  const rows = [...block.children];
+  const columns = [];
+  
+  // Collect columns from all rows
+  rows.forEach((row) => {
+    const cells = [...row.children];
+    cells.forEach((cell, index) => {
+      if (!columns[index]) {
+        columns[index] = document.createElement('div');
+        columns[index].className = 'column';
       }
+      columns[index].append(...cell.childNodes);
     });
   });
+  
+  // Clear block and add columns
+  block.innerHTML = '';
+  columns.forEach((column) => {
+    block.appendChild(column);
+  });
+  
+  // Set column count class for responsive behavior
+  block.classList.add(`columns-${columns.length}`);
 }

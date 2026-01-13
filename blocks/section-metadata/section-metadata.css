@@ -1,0 +1,9 @@
+/**
+ * @file section-metadata.css
+ * @description Styles for the Section Metadata block
+ * @version 1.0.0
+ */
+
+.section-metadata {
+  display: none; /* Metadata blocks are hidden by default */
+}

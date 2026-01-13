@@ -7,3 +7,19 @@ helix-importer-ui
 .DS_Store
 *.bak
 .idea
+
+# Visual comparison temporary files
+.visual-compare/
+
+# Figma raw data
+figma-variables-raw.json
+figma-variables-summary.json
+
+# MCP setup (contains tokens)
+.mcp-setup/mcp.json
+.mcp-setup/.figma-token
+
+# Temporary documentation
+*-COMPLETE.md
+*-FIX*.md
+CLEANUP-PLAN.md

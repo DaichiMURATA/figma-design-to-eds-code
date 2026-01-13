@@ -1,0 +1,59 @@
+{
+  "project": "figma-design-to-eds-code",
+  "description": "Figma URLs for EDS component generation",
+  "mainFile": {
+    "url": "https://www.figma.com/file/REPLACE_WITH_YOUR_FILE_ID/REPLACE_WITH_YOUR_FILE_NAME",
+    "description": "Main design file for EDS components",
+    "lastUpdated": "2026-01-09"
+  },
+  "components": {
+    "hero": {
+      "url": "https://www.figma.com/file/FILE_ID/FILE_NAME?node-id=NODE_ID",
+      "description": "Hero block with multiple layout variants",
+      "variants": [
+        "Default",
+        "Centered",
+        "FullWidth",
+        "WithImage",
+        "WithoutImage"
+      ],
+      "userStory": "docs/user-stories/hero-block.md",
+      "status": "pending",
+      "lastUpdated": "2026-01-09"
+    },
+    "card": {
+      "url": "https://www.figma.com/file/FILE_ID/FILE_NAME?node-id=NODE_ID",
+      "description": "Card component with image and text",
+      "variants": [
+        "Vertical",
+        "Horizontal",
+        "Minimal"
+      ],
+      "userStory": "docs/user-stories/card-block.md",
+      "status": "pending",
+      "lastUpdated": "2026-01-09"
+    }
+  },
+  "designTokens": {
+    "url": "https://www.figma.com/file/FILE_ID/FILE_NAME",
+    "description": "All design tokens (colors, typography, spacing)",
+    "categories": [
+      "Colors - Primitives",
+      "Colors - Brand",
+      "Colors - Semantic",
+      "Typography",
+      "Spacing",
+      "Border Radius",
+      "Shadows",
+      "Transitions"
+    ],
+    "lastSynced": "2026-01-09"
+  },
+  "notes": [
+    "Replace FILE_ID and FILE_NAME with actual Figma file information",
+    "NODE_ID is optional - include only when linking to specific component",
+    "Update 'status' field after generating each component",
+    "Keep 'lastUpdated' field current for tracking changes"
+  ]
+}
+
