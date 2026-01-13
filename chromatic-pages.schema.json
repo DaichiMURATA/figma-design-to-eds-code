@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Chromatic Pages Configuration",
+  "description": "Configuration for Playwright E2E pages to test with Chromatic",
+  "type": "object",
+  "properties": {
+    "baseUrl": {
+      "type": "string",
+      "description": "Base URL for the site (can be overridden by SOURCE_URL env var)"
+    },
+    "pages": {
+      "type": "array",
+      "description": "List of pages to test",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name identifier for the page"
+          },
+          "path": {
+            "type": "string",
+            "description": "URL path (relative to baseUrl)"
+          },
+          "viewports": {
+            "type": "array",
+            "description": "List of viewports to test",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Viewport name (e.g., desktop, mobile, tablet)"
+                },
+                "width": {
+                  "type": "number",
+                  "description": "Viewport width in pixels"
+                },
+                "height": {
+                  "type": "number",
+                  "description": "Viewport height in pixels"
+                }
+              },
+              "required": ["name", "width", "height"]
+            }
+          },
+          "waitForNetworkIdle": {
+            "type": "boolean",
+            "description": "Wait for network to be idle before taking snapshot",
+            "default": true
+          },
+          "additionalWaitTime": {
+            "type": "number",
+            "description": "Additional wait time in milliseconds after page load",
+            "default": 2000
+          }
+        },
+        "required": ["name", "path", "viewports"]
+      }
+    }
+  },
+  "required": ["baseUrl", "pages"]
+}

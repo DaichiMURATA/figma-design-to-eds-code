@@ -22,9 +22,10 @@ permissions:
 jobs:
   # ============================================
   # LAYER 1: Storybook Component Testing
+  # 変更のあったBlockのみテスト（onlyChanged: true）
   # ============================================
   layer1-storybook:
-    name: "Layer 1: Storybook Components"
+    name: "Layer 1: Storybook Components (Changed Blocks Only)"
     runs-on: ubuntu-latest
     if: github.event.inputs.test_layer != 'layer-2-only'
     outputs:
@@ -48,7 +49,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
-      - name: Run Chromatic (Storybook)
+      - name: Run Chromatic (Storybook - Changed Blocks Only)
         id: chromatic
         uses: chromaui/action@v1
         with:
@@ -56,7 +57,7 @@ jobs:
           buildScriptName: build-storybook
           exitZeroOnChanges: true
           exitOnceUploaded: true
-          onlyChanged: true
+          onlyChanged: true  # 変更のあったBlockのStorybookのみテスト
         continue-on-error: false
       
       - name: Extract Chromatic Build Number
@@ -112,9 +113,10 @@ jobs:
 
   # ============================================
   # LAYER 2: Playwright E2E Page Testing
+  # chromatic-pages.config.json で定義されたページのみテスト
   # ============================================
   layer2-playwright:
-    name: "Layer 2: Playwright E2E Pages"
+    name: "Layer 2: Playwright E2E Pages (Config-Based)"
     runs-on: ubuntu-latest
     if: github.event.inputs.test_layer != 'layer-1-only'
     outputs:
@@ -223,16 +225,17 @@ jobs:
             let body = '## 🎨 Chromatic Two-Layer Visual Testing Results\n\n';
             
             // Layer 1 Results
-            body += '### Layer 1: Storybook Component Testing\n';
+            body += '### Layer 1: Storybook Component Testing (Changed Blocks Only)\n';
             if (layer1Status === 'success') {
               const chromaticUrl = '${{ needs.layer1-storybook.outputs.chromatic_url }}';
               const buildNumber = '${{ needs.layer1-storybook.outputs.build_number }}';
               const storyCount = '${{ needs.layer1-storybook.outputs.story_count }}';
-              body += '✅ **Passed** - Component stories tested\n';
+              body += '✅ **Passed** - Changed block stories tested\n';
               if (chromaticUrl) {
                 body += `- 🔗 [View Chromatic Build #${buildNumber} →](${chromaticUrl})\n`;
               }
               body += `- Stories tested: ${storyCount}\n`;
+              body += '- ⚡ Only changed blocks are tested for efficiency\n';
             } else if (layer1Status === 'skipped') {
               body += '⏭️ **Skipped** - Layer 1 not requested\n';
             } else {
@@ -241,7 +244,7 @@ jobs:
             body += '\n';
             
             // Layer 2 Results
-            body += '### Layer 2: Playwright E2E Page Testing\n';
+            body += '### Layer 2: Playwright E2E Page Testing (Config-Based)\n';
             if (layer2Status === 'success') {
               body += '✅ **Passed** - E2E pages tested\n';
               const chromaticUrl = '${{ needs.layer2-playwright.outputs.chromatic_url }}';
@@ -250,6 +253,7 @@ jobs:
                 body += `- 🔗 [View Chromatic Build #${buildNumber} →](${chromaticUrl})\n`;
               }
               body += '- Screenshots captured and available in artifacts\n';
+              body += '- 📄 Test pages defined in `chromatic-pages.config.json`\n';
               body += `- Source: \`${{ github.head_ref || github.ref_name }}\`\n`;
               body += `- Target: \`${{ github.base_ref || 'main' }}\`\n`;
               body += `- Source URL: https://${{ github.head_ref || github.ref_name }}--figma-design-to-eds-code--daichimurata.aem.live/\n`;
@@ -264,13 +268,15 @@ jobs:
             // Footer
             body += '---\n';
             body += '💡 **About Two-Layer Testing**:\n';
-            body += '- **Layer 1**: Tests isolated components in Storybook\n';
-            body += '- **Layer 2**: Tests complete pages with Playwright\n';
+            body += '- **Layer 1**: Tests isolated components in Storybook (only changed blocks)\n';
+            body += '- **Layer 2**: Tests complete pages with Playwright (config-based)\n';
             body += '\n';
             body += '🎯 **Next Steps**:\n';
             body += '1. Review visual diffs in Chromatic dashboard\n';
             body += '2. Approve or reject changes\n';
             body += '3. Download artifacts for detailed screenshots\n';
+            body += '\n';
+            body += '📝 **Add More Test Pages**: Edit `chromatic-pages.config.json`\n';
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,

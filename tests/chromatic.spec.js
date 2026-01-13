@@ -1,47 +1,66 @@
 /**
  * Chromatic Visual Regression Test for figma-design-to-eds-code
  * 
- * Tests homepage across different viewports using Chromatic.
+ * このテストは chromatic-pages.config.json の設定に基づいて動的に生成されます。
+ * テスト対象ページを追加・削除する場合は、設定ファイルを編集してください。
  */
 
 import { test, takeSnapshot } from '@chromatic-com/playwright';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+// 現在のファイルのディレクトリを取得
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// 設定ファイルを読み込む
+const configPath = join(__dirname, '..', 'chromatic-pages.config.json');
+const config = JSON.parse(readFileSync(configPath, 'utf-8'));
+
+// 環境変数でbaseURLを上書き可能
+const baseURL = process.env.SOURCE_URL || config.baseUrl;
 
 test.describe('figma-design-to-eds-code Visual Regression', () => {
-  test('homepage - desktop', async ({ page }, testInfo) => {
-    // Set desktop viewport
-    await page.setViewportSize({ width: 1200, height: 800 });
-    
-    // Navigate to homepage
-    console.log(`📱 Navigating to: ${page.context()._options.baseURL || 'homepage'}`);
-    await page.goto('/', { waitUntil: 'networkidle', timeout: 30000 });
-    
-    // Wait for content to load
-    await page.waitForTimeout(2000);
-    
-    console.log('📸 Taking Chromatic snapshot...');
-    
-    // Take Chromatic snapshot
-    await takeSnapshot(page, 'homepage-desktop', testInfo);
-    
-    console.log('✅ Chromatic snapshot captured successfully!');
-  });
-  
-  test('homepage - mobile', async ({ page }, testInfo) => {
-    // Set mobile viewport
-    await page.setViewportSize({ width: 375, height: 667 });
-    
-    // Navigate to homepage
-    console.log(`📱 Navigating to: ${page.context()._options.baseURL || 'homepage'}`);
-    await page.goto('/', { waitUntil: 'networkidle', timeout: 30000 });
-    
-    // Wait for content to load
-    await page.waitForTimeout(2000);
-    
-    console.log('📸 Taking Chromatic snapshot...');
-    
-    // Take Chromatic snapshot
-    await takeSnapshot(page, 'homepage-mobile', testInfo);
-    
-    console.log('✅ Chromatic snapshot captured successfully!');
-  });
+  // 設定ファイルの各ページに対してテストを生成
+  for (const pageConfig of config.pages) {
+    for (const viewport of pageConfig.viewports) {
+      const testName = `${pageConfig.name} - ${viewport.name}`;
+      
+      test(testName, async ({ page }, testInfo) => {
+        // ビューポートを設定
+        await page.setViewportSize({ 
+          width: viewport.width, 
+          height: viewport.height 
+        });
+        
+        // ページに移動
+        const fullUrl = `${baseURL}${pageConfig.path}`;
+        console.log(`📱 Navigating to: ${fullUrl} (${viewport.width}x${viewport.height})`);
+        
+        const navigationOptions = {
+          timeout: 30000
+        };
+        
+        if (pageConfig.waitForNetworkIdle) {
+          navigationOptions.waitUntil = 'networkidle';
+        }
+        
+        await page.goto(pageConfig.path, navigationOptions);
+        
+        // 追加の待機時間
+        if (pageConfig.additionalWaitTime) {
+          await page.waitForTimeout(pageConfig.additionalWaitTime);
+        }
+        
+        console.log('📸 Taking Chromatic snapshot...');
+        
+        // Chromaticスナップショットを取得
+        const snapshotName = `${pageConfig.name}-${viewport.name}`;
+        await takeSnapshot(page, snapshotName, testInfo);
+        
+        console.log(`✅ Chromatic snapshot captured: ${snapshotName}`);
+      });
+    }
+  }
 });

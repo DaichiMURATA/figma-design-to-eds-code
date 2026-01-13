@@ -1,0 +1,24 @@
+{
+  "$schema": "./chromatic-pages.schema.json",
+  "baseUrl": "https://main--figma-design-to-eds-code--daichimurata.aem.live",
+  "pages": [
+    {
+      "name": "homepage",
+      "path": "/",
+      "viewports": [
+        {
+          "name": "desktop",
+          "width": 1200,
+          "height": 800
+        },
+        {
+          "name": "mobile",
+          "width": 375,
+          "height": 667
+        }
+      ],
+      "waitForNetworkIdle": true,
+      "additionalWaitTime": 2000
+    }
+  ]
+}

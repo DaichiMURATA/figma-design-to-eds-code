@@ -63,15 +63,103 @@ npm run chromatic:upload
 
 ### Two-Layer Testing
 
-#### **Layer 1: Storybook Component Testing**
+#### **Layer 1: Storybook Component Testing（変更のあったBlockのみ）**
 - Storybookで定義された全てのコンポーネントをテスト
 - ブロック単位での細かいビジュアル確認
-- 変更のあったブロックのみをテスト（`onlyChanged: true`）
+- **変更のあったブロックのみをテスト**（`onlyChanged: true`）
+- コスト効率的な差分検出
 
-#### **Layer 2: Playwright E2E Page Testing**
-- 実際のEDS URLにアクセスしてページ全体をテスト
-- デスクトップ（1200x800）とモバイル（375x667）の両方をテスト
-- ヘッダー、フッター、セクション間の統合確認
+#### **Layer 2: Playwright E2E Page Testing（設定ファイルベース）**
+- `chromatic-pages.config.json` で定義されたページのみをテスト
+- デフォルトはTOPページのみ（Desktop & Mobile）
+- 必要に応じてページを追加可能
+
+---
+
+## 📄 テスト対象ページの管理
+
+### chromatic-pages.config.json
+
+Layer 2のテスト対象ページは `chromatic-pages.config.json` で管理されます。
+
+#### デフォルト設定（TOPページのみ）:
+
+```json
+{
+  "baseUrl": "https://main--figma-design-to-eds-code--daichimurata.aem.live",
+  "pages": [
+    {
+      "name": "homepage",
+      "path": "/",
+      "viewports": [
+        {
+          "name": "desktop",
+          "width": 1200,
+          "height": 800
+        },
+        {
+          "name": "mobile",
+          "width": 375,
+          "height": 667
+        }
+      ],
+      "waitForNetworkIdle": true,
+      "additionalWaitTime": 2000
+    }
+  ]
+}
+```
+
+#### ページを追加する例:
+
+```json
+{
+  "baseUrl": "https://main--figma-design-to-eds-code--daichimurata.aem.live",
+  "pages": [
+    {
+      "name": "homepage",
+      "path": "/",
+      "viewports": [
+        { "name": "desktop", "width": 1200, "height": 800 },
+        { "name": "mobile", "width": 375, "height": 667 }
+      ],
+      "waitForNetworkIdle": true,
+      "additionalWaitTime": 2000
+    },
+    {
+      "name": "about",
+      "path": "/about",
+      "viewports": [
+        { "name": "desktop", "width": 1200, "height": 800 }
+      ],
+      "waitForNetworkIdle": true,
+      "additionalWaitTime": 1000
+    },
+    {
+      "name": "products",
+      "path": "/products",
+      "viewports": [
+        { "name": "tablet", "width": 768, "height": 1024 }
+      ],
+      "waitForNetworkIdle": false,
+      "additionalWaitTime": 3000
+    }
+  ]
+}
+```
+
+#### 設定項目:
+
+| 項目 | 説明 | 必須 |
+|------|------|------|
+| `name` | ページの識別名 | ✅ |
+| `path` | URLパス（baseUrlからの相対パス） | ✅ |
+| `viewports` | テストするビューポートのリスト | ✅ |
+| `viewports[].name` | ビューポート名 | ✅ |
+| `viewports[].width` | 幅（px） | ✅ |
+| `viewports[].height` | 高さ（px） | ✅ |
+| `waitForNetworkIdle` | ネットワークアイドル待機 | ❌ (default: true) |
+| `additionalWaitTime` | 追加待機時間（ms） | ❌ (default: 2000) |
 
 ---
 
