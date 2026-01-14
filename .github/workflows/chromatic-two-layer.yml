@@ -280,12 +280,6 @@ jobs:
             const layer2Status = '${{ needs.layer2-playwright.result }}';
             
             // Debug: Log outputs
-            console.log('DEBUG: Layer 1 Status:', layer1Status);
-            console.log('DEBUG: Layer 1 chromatic_url:', '${{ needs.layer1-storybook.outputs.chromatic_url }}');
-            console.log('DEBUG: Layer 1 build_number:', '${{ needs.layer1-storybook.outputs.build_number }}');
-            console.log('DEBUG: Layer 2 Status:', layer2Status);
-            console.log('DEBUG: Layer 2 chromatic_url:', '${{ needs.layer2-playwright.outputs.chromatic_url }}');
-            console.log('DEBUG: Layer 2 build_number:', '${{ needs.layer2-playwright.outputs.build_number }}');
             
             let body = '## 🎨 Chromatic Two-Layer Visual Testing Results\n\n';
             
@@ -295,14 +289,12 @@ jobs:
               const chromaticUrl = '${{ needs.layer1-storybook.outputs.chromatic_url }}';
               const buildNumber = '${{ needs.layer1-storybook.outputs.build_number }}';
               const storyCount = '${{ needs.layer1-storybook.outputs.story_count }}';
-              body += '✅ **Passed** - Changed block stories tested\n';
+              body += '✅ **Executed** - Changed block stories tested\n';
               // Debug output in PR comment
-              body += `- DEBUG: chromatic_url='${chromaticUrl}' (length: ${chromaticUrl.length})\n`;
-              body += `- DEBUG: build_number='${buildNumber}'\n`;
               if (chromaticUrl) {
                 body += `- 🔗 [View Chromatic Build #${buildNumber} →](${chromaticUrl})\n`;
               } else {
-                body += `- ⚠️ Chromatic URL not available (empty or undefined)\n`;
+                body += `- ⚠️ Chromatic URL not available\n`;
               }
               body += `- Stories tested: ${storyCount}\n`;
               body += '- ⚡ Only changed blocks are tested for efficiency\n';
@@ -316,16 +308,14 @@ jobs:
             // Layer 2 Results
             body += '### Layer 2: Playwright E2E Page Testing (Config-Based)\n';
             if (layer2Status === 'success') {
-              body += '✅ **Passed** - E2E pages tested\n';
+              body += '✅ **Executed** - E2E pages tested\n';
               const chromaticUrl = '${{ needs.layer2-playwright.outputs.chromatic_url }}';
               const buildNumber = '${{ needs.layer2-playwright.outputs.build_number }}';
               // Debug output in PR comment
-              body += `- DEBUG: chromatic_url='${chromaticUrl}' (length: ${chromaticUrl.length})\n`;
-              body += `- DEBUG: build_number='${buildNumber}'\n`;
               if (chromaticUrl) {
                 body += `- 🔗 [View Chromatic Build #${buildNumber} →](${chromaticUrl})\n`;
               } else {
-                body += `- ⚠️ Chromatic URL not available (empty or undefined)\n`;
+                body += `- ⚠️ Chromatic URL not available\n`;
               }
               body += '- Screenshots captured and available in artifacts\n';
               body += '- 📄 Test pages defined in `chromatic-pages.config.json`\n';
