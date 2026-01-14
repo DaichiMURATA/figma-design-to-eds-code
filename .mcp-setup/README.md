@@ -5,7 +5,7 @@
 ### 1回実行するだけ！
 
 ```bash
-cd /Users/dmurata/Documents/Dev/figma-design-to-eds-code/.mcp-setup
+cd /Users/dmurata/Documents/Dev/d2c/.mcp-setup
 ./setup-figma-mcp.sh
 ```
 

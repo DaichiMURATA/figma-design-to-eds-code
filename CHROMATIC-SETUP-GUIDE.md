@@ -66,7 +66,7 @@ npm run chromatic:storybook
 export CHROMATIC_PLAYWRIGHT_TOKEN="chpt_YYYYYYYYYYYY"
 
 # Playwright E2Eテスト＆アップロード
-SOURCE_URL=https://main--figma-design-to-eds-code--daichimurata.aem.live npm run test:chromatic
+SOURCE_URL=https://main--d2c--daichimurata.aem.live npm run test:chromatic
 npm run chromatic:playwright
 ```
 
@@ -104,7 +104,7 @@ Layer 2のテスト対象ページは `chromatic-pages.config.json` で管理さ
 
 ```json
 {
-  "baseUrl": "https://main--figma-design-to-eds-code--daichimurata.aem.live",
+  "baseUrl": "https://main--d2c--daichimurata.aem.live",
   "pages": [
     {
       "name": "homepage",
@@ -132,7 +132,7 @@ Layer 2のテスト対象ページは `chromatic-pages.config.json` で管理さ
 
 ```json
 {
-  "baseUrl": "https://main--figma-design-to-eds-code--daichimurata.aem.live",
+  "baseUrl": "https://main--d2c--daichimurata.aem.live",
   "pages": [
     {
       "name": "homepage",

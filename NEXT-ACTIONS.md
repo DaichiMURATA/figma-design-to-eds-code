@@ -16,7 +16,7 @@
 
 ### 📍 現在地
 
-- **テンプレートプロジェクト**: `figma-design-to-eds-code/`
+- **テンプレートプロジェクト**: `d2c/`
 - **参照プロジェクト**: `ak-eds/`（Storybook完備）
 - **次のステップ**: Layer 1（Storybook）の実装
 
@@ -27,7 +27,7 @@
 ### ステップ1: 依存関係の追加
 
 ```bash
-cd /Users/dmurata/Documents/Dev/figma-design-to-eds-code
+cd /Users/dmurata/Documents/Dev/d2c
 npm install @storybook/addon-a11y@^9.0.16 @storybook/addon-docs@^9.0.11 @storybook/html-vite@^9.0.11 storybook@^9.0.11 msw-storybook-addon --save-dev
 ```
 

@@ -79,7 +79,7 @@
 npm run test:chromatic
 
 # 特定のブランチURLでテスト
-SOURCE_URL=https://feature-branch--figma-design-to-eds-code--daichimurata.aem.live npm run test:chromatic
+SOURCE_URL=https://feature-branch--d2c--daichimurata.aem.live npm run test:chromatic
 ```
 
 ## ⚠️ 注意事項

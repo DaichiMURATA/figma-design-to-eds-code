@@ -139,7 +139,7 @@ PRマージ (main):
 ### テンプレートプロジェクト候補
 
 ```
-/Users/dmurata/Documents/Dev/figma-design-to-eds-code/
+/Users/dmurata/Documents/Dev/d2c/
   ├── blocks/              # EDS Blocks
   │   └── {block}/
   │       ├── {block}.js
@@ -268,9 +268,9 @@ PRマージ (main):
 
 ### 作成予定ドキュメント
 
-- `figma-design-to-eds-code/GETTING-STARTED.md` - テンプレート利用ガイド
-- `figma-design-to-eds-code/STORYBOOK-GUIDE.md` - Storybook作成ガイド
-- `figma-design-to-eds-code/PR-WORKFLOW.md` - PR作成〜承認フロー
+- `d2c/GETTING-STARTED.md` - テンプレート利用ガイド
+- `d2c/STORYBOOK-GUIDE.md` - Storybook作成ガイド
+- `d2c/PR-WORKFLOW.md` - PR作成〜承認フロー
 
 ---
 
@@ -280,7 +280,7 @@ PRマージ (main):
 
 1. **テンプレートプロジェクトの初期化**
    ```bash
-   cd /Users/dmurata/Documents/Dev/figma-design-to-eds-code
+   cd /Users/dmurata/Documents/Dev/d2c
    # Storybookセットアップ開始
    ```
 

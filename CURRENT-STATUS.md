@@ -21,7 +21,7 @@
 
 ### npm install実行中
 ```bash
-cd /Users/dmurata/Documents/Dev/figma-design-to-eds-code
+cd /Users/dmurata/Documents/Dev/d2c
 # 実行中...
 ```
 
@@ -34,7 +34,7 @@ cd /Users/dmurata/Documents/Dev/figma-design-to-eds-code
 
 ### 1. Storybook起動テスト（3分）
 ```bash
-cd /Users/dmurata/Documents/Dev/figma-design-to-eds-code
+cd /Users/dmurata/Documents/Dev/d2c
 npm run storybook
 # → http://localhost:6006 でブラウザが開く
 # → Hero blockの3つのStoryが表示されるか確認

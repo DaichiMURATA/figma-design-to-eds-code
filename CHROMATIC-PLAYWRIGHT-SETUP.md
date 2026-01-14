@@ -28,13 +28,13 @@
 環境変数を設定して、Playwrightテストを実行し、Chromaticにアップロードします。
 
 ```bash
-cd /Users/dmurata/Documents/Dev/figma-design-to-eds-code
+cd /Users/dmurata/Documents/Dev/d2c
 
 # 環境変数を設定
 export CHROMATIC_PLAYWRIGHT_TOKEN="chpt_YYYYYYYYYYYY"
 
 # Playwrightテストを実行
-SOURCE_URL=https://main--figma-design-to-eds-code--daichimurata.aem.live npm run test:chromatic
+SOURCE_URL=https://main--d2c--daichimurata.aem.live npm run test:chromatic
 
 # Chromaticにアップロード
 npm run chromatic:playwright
@@ -125,7 +125,7 @@ PR作成後、GitHub ActionsのPRコメントに以下のように表示され�
 **解決**:
 ```bash
 # ローカルでテスト実行
-SOURCE_URL=https://main--figma-design-to-eds-code--daichimurata.aem.live npm run test:chromatic
+SOURCE_URL=https://main--d2c--daichimurata.aem.live npm run test:chromatic
 
 # テスト結果を確認
 cat test-results/chromatic.spec.js-results.xml
@@ -141,7 +141,7 @@ Layer 2のテスト対象ページは `chromatic-pages.config.json` で管理さ
 
 ```json
 {
-  "baseUrl": "https://main--figma-design-to-eds-code--daichimurata.aem.live",
+  "baseUrl": "https://main--d2c--daichimurata.aem.live",
   "pages": [
     {
       "name": "homepage",

@@ -95,7 +95,7 @@ open /Applications/Cursor.app
 # 2. 既存トークンを削除
 # 3. 新しいトークンを生成（正しいscopeで）
 # 4. セットアップスクリプト再実行
-cd /Users/dmurata/Documents/Dev/figma-design-to-eds-code/.mcp-setup
+cd /Users/dmurata/Documents/Dev/d2c/.mcp-setup
 ./setup-figma-mcp.sh
 ```
 

@@ -112,7 +112,7 @@ Figma関連のツールが表示されればOK！
 
 1. **figma-urls.json更新**:
    ```bash
-   cd /Users/dmurata/Documents/Dev/figma-design-to-eds-code
+   cd /Users/dmurata/Documents/Dev/d2c
    # 実際のFigma URLに置き換え
    vim figma-urls.json
    ```

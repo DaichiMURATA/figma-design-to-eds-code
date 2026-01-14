@@ -155,7 +155,7 @@ cd .mcp-setup
 ## 📁 プロジェクト構造
 
 ```
-figma-design-to-eds-code/
+d2c/
 ├── .cursorrules                        # AI自動生成ルール ⭐
 ├── BLOCK-GENERATION-GUIDE.md           # Block生成包括ガイド ⭐
 ├── VISUAL-REGRESSION-STRATEGY.md       # Visual Regression戦略 ⭐
@@ -212,7 +212,7 @@ figma-design-to-eds-code/
 
 1. **Storybookを起動して確認**:
    ```bash
-   cd /Users/dmurata/Documents/Dev/figma-design-to-eds-code
+   cd /Users/dmurata/Documents/Dev/d2c
    npm run storybook
    ```
 

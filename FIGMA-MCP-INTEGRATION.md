@@ -308,7 +308,7 @@ Visual Regressionテストでカバーできるようにしてください。
 
 ```json
 {
-  "project": "figma-design-to-eds-code",
+  "project": "d2c",
   "mainFile": "https://www.figma.com/file/ABC123DEF456/EDS-Components",
   "components": {
     "hero": {
@@ -443,7 +443,7 @@ export FIGMA_ACCESS_TOKEN="figd_NEW_TOKEN"
 
 ---
 
-**プロジェクト**: figma-design-to-eds-code  
+**プロジェクト**: d2c  
 **憲章**: フロントエンドの不具合撲滅運動  
 **更新日**: 2026-01-09
 
