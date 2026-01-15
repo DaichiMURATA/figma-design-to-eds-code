@@ -1,4 +1,4 @@
-# フロントエンドの不具合撲滅運動 - 実装ロードマップ
+# フロントエンドの不具合撲滅運動 - ロードマップ
 
 ## 🎯 憲章
 
@@ -9,236 +9,86 @@
 ## 📊 実現したいシナリオ（全体像）
 
 ### 1. デザイン・要件からのコード生成
-- ✅ MCP経由でFigmaデザインを取得
-- ✅ UserStory（markdown）を参照
-- ✅ 双方を設計書としてコード生成（ak-eds踏襲）
+
+- ✅ **MCP経由でFigmaデザインを取得**
+  - Figma Personal Access Token (PAT) による API 認証
+  - デザイントークン（Colors, Typography, Spacing など）の自動抽出
+  - コンポーネント構造の解析
+
+- ✅ **UserStory（markdown）を参照（オプション）**
+  - Figma のみでのブロック生成も可能
+  - UserStory がある場合は追加の要件や検証シナリオを反映
+
+- ✅ **双方を設計書としてコード生成**
+  - EDS Block 実装コード（`.js`, `.css`）
+  - Storybook Story（`.stories.js`）
+  - Adobe EDS Block Collection のパターンに準拠
 
 ### 2. Storybookコード生成
-- ⏳ 実装コード + Storybook用コード
-- ⏳ StorybookのStory：FigmaのVariant定義粒度で作成
-- ⏳ UserStoryから追加検証バリエーションを識別・追加
 
-### 3. PR時のVisual Regressionテスト（2層構造）
-- ⏳ **Layer 1**: 変更BlockのStorybook（Chromatic & Storybook）
-- ✅ **Layer 2**: 事前定義URLのE2E（Chromatic & Playwright）
+- ✅ **実装コード + Storybook用コード**
+  - Block の JavaScript ロジック
+  - Figma デザインに基づく CSS スタイル
+  - Storybook Story の自動生成
+
+- ✅ **StorybookのStory：FigmaのVariant定義粒度で作成**
+  - 1:1 マッピング: Figma Variant = Storybook Story
+  - Component Set の Variant を検出して Story を生成
+  - Sample Instances がある場合はそれも Story 化
+
+- ✅ **UserStoryから追加検証バリエーションを識別・追加（オプション）**
+  - エラーケース、エッジケース
+  - ユーザーインタラクションシナリオ
+
+### 3. Visual Regressionテスト（2層構造）
+
+- ✅ **Layer 1: Storybook Component Testing**
+  - 変更された Block のみをテスト（変更差分検出）
+  - Chromatic による自動スナップショット比較
+  - WCAG 2.1 Level AA アクセシビリティテスト
+  - 自動ドキュメント生成
+
+- ✅ **Layer 2: Playwright E2E Page Testing**
+  - 設定ファイル（`chromatic-pages.config.json`）で管理
+  - 事前定義された重要ページのフルページテスト
+  - デスクトップ・モバイル両対応
 
 ### 4. PR承認フロー
-- ✅ PRコメントからChromaticビルド画面に遷移
-- ✅ Diffを確認
-- ✅ PR承認時にmainブランチでbaselineを更新
-- ⏳ ChromaticチェックをMandatory Stepに設定
 
----
+- ✅ **PRコメントからChromaticビルド画面に遷移**
+  - Layer 1（Storybook）と Layer 2（Playwright）の両方のリンク
+  - ビルド番号と URL が自動的にコメントされる
 
-## ✅ 既に実現済み（my-websiteで検証完了）
+- ✅ **Diffを確認**
+  - Chromatic の 1up/2up ビューで視覚的差分を確認
+  - 変更の Accept/Reject をオンラインで実施
 
-### Chromatic統合基盤
+- ✅ **PR承認時に develop ブランチで baseline を更新**
+  - PR マージ時に自動的に Chromatic baseline を更新
+  - `--auto-accept-changes` による自動承認
+  - 次の PR は新しい baseline と比較される
 
-| 項目 | 状態 | 実装場所 |
-|-----|------|---------|
-| **Layer 2: Playwright E2E** | ✅ | `chromatic.config.js`, `tests/chromatic.spec.js` |
-| **Baseline更新ワークフロー** | ✅ | `.github/workflows/chromatic-baseline.yml` |
-| **PR用ワークフロー** | ✅ | `.github/workflows/chromatic-pr.yml` |
-| **PRコメント自動投稿** | ✅ | `chromatic-pr.yml` (post-pr-comment job) |
-| **Chromatic Build URL遷移** | ✅ | 正しいDiffビューに遷移 |
-| **EDS Branch URL対応** | ✅ | `https://{branch}--{repo}--{owner}.{domain}/` |
+- ✅ **PR Description 自動生成**
+  - ブランチ名から AEM.live Preview URL を自動生成
+  - `Test URL:` 形式で aem-psi-check に対応
+  - `aem.page`（開発用）と `aem.live`（本番用）の両方を提供
 
-### ワークフロー戦略
+### 5. 品質テスト機能
 
-```
-PR作成:
-  → chromatic-pr.yml 実行
-  → Layer 2 (Playwright E2E) テスト
-  → Chromaticアップロード (--branch, --parent-branch)
-  → PRコメント投稿
-  → Diffレビュー
+- ✅ **Accessibility Testing (A11y)**
+  - Storybook の `@storybook/addon-a11y` による自動チェック
+  - WCAG 2.1 Level AA 準拠
+  - カラーコントラスト、ARIA 属性、キーボードナビゲーション検証
 
-PRマージ (main):
-  → chromatic-baseline.yml 実行
-  → Baseline更新
-  → 次のPRはこのbaselineと比較
-```
+- ✅ **Documentation Generation**
+  - コンポーネントの使い方を自動文書化
+  - JSDoc コメントから自動生成
+  - 目次（TOC）付き
 
----
-
-## ⏳ これから実装すること
-
-### Phase 1: Storybook統合（Layer 1の実装）
-
-#### 1.1 Storybookセットアップ
-- [ ] Storybookの依存関係追加
-- [ ] `.storybook/` 設定ファイル作成
-- [ ] EDS Block用のStorybook設定
-- [ ] `npm run build-storybook` スクリプト追加
-
-#### 1.2 サンプルBlockのStorybook作成
-- [ ] 既存Block（例: `hero`）のStorybook Story作成
-- [ ] Figma Variant相当のStory展開
-- [ ] `argTypes` と `args` の定義
-
-#### 1.3 Chromatic統合（Storybook）
-- [ ] `chromatic-pr.yml` にLayer 1追加
-- [ ] Storybook buildとChromatic upload
-- [ ] Layer 1とLayer 2の並行実行
-
-### Phase 2: 変更差分検出によるSmart実行
-
-#### 2.1 変更Block検出スクリプト（ak-eds踏襲）
-- [ ] `scripts/detect-changed-blocks.js` 移植
-- [ ] Git diff解析
-- [ ] 変更Blockリスト出力（JSON）
-
-#### 2.2 変更BlockのみStorybookテスト
-- [ ] `scripts/run-chromatic-smart.js` 移植
-- [ ] 変更Blockに対応するStoryのみ実行
-- [ ] グローバル変更時は全Block実行
-
-#### 2.3 E2Eページ選択（Layer 2）
-- [ ] `tests/pages-manifest.json` 作成
-- [ ] `scripts/select-e2e-pages.js` 移植
-- [ ] 変更Blockとページのマッピング
-
-### Phase 3: Figma → コード生成の強化
-
-#### 3.1 Figma Variant → Storybook Story生成
-- [ ] Figma MCP経由でVariant情報取得
-- [ ] Variant → Story export定義の自動生成
-- [ ] `{block}.story.js` テンプレート生成
-
-#### 3.2 UserStory → バリエーション追加
-- [ ] UserStory markdown解析
-- [ ] テストシナリオ抽出
-- [ ] 追加Storyバリエーション提案
-
-#### 3.3 コード生成ワークフロー
-- [ ] Block実装コード生成（`.js`, `.css`）
-- [ ] Storybook Story生成（`.story.js`）
-- [ ] 生成ルールのドキュメント化
-
-### Phase 4: PR承認フローの強化
-
-#### 4.1 ChromaticチェックをMandatory化
-- [ ] GitHub Branch Protection設定
-- [ ] Required status checks: `Chromatic PR`
-- [ ] ドキュメント化
-
-#### 4.2 PR承認ガイドライン
-- [ ] Chromatic Diffレビュー手順
-- [ ] Accept/Rejectガイドライン
-- [ ] エスカレーションフロー
-
-#### 4.3 統合ドキュメント
-- [ ] 開発者向けガイド
-- [ ] レビュアー向けガイド
-- [ ] トラブルシューティング
-
----
-
-## 🏗️ プロジェクト構成
-
-### テンプレートプロジェクト候補
-
-```
-/Users/dmurata/Documents/Dev/d2c/
-  ├── blocks/              # EDS Blocks
-  │   └── {block}/
-  │       ├── {block}.js
-  │       ├── {block}.css
-  │       └── {block}.story.js  ← Storybook Story
-  ├── scripts/
-  │   ├── detect-changed-blocks.js
-  │   ├── run-chromatic-smart.js
-  │   └── select-e2e-pages.js
-  ├── tests/
-  │   ├── chromatic.spec.js      ← Layer 2 (Playwright)
-  │   └── pages-manifest.json
-  ├── .storybook/           ← Storybook設定
-  ├── .github/workflows/
-  │   ├── chromatic-baseline.yml
-  │   └── chromatic-pr.yml       ← Layer 1 + Layer 2
-  └── chromatic.config.js
-```
-
-### 参照プロジェクト
-
-| プロジェクト | 参照箇所 |
-|------------|---------|
-| **ak-eds** | コード生成、Smart実行、2層戦略 |
-| **eds-base-site** | Baseline/PR分離戦略、Storybook設定 |
-| **my-website** | Playwright E2E、EDS URL対応 |
-
----
-
-## 📅 実装優先順位
-
-### 🚀 High Priority（Phase 1）
-
-1. **Storybookセットアップ**
-   - 理由: Layer 1の基盤となる
-   - 期間: 1-2日
-   - 依存: なし
-
-2. **サンプルBlockのStory作成**
-   - 理由: Layer 1の動作確認
-   - 期間: 1日
-   - 依存: Storybookセットアップ
-
-3. **Layer 1のChromatic統合**
-   - 理由: 2層戦略の完成
-   - 期間: 1日
-   - 依存: Storybook Story
-
-### 🔄 Medium Priority（Phase 2）
-
-4. **変更差分検出**
-   - 理由: Smart実行によるCI時間短縮
-   - 期間: 2-3日
-   - 依存: Layer 1完成
-
-5. **E2Eページ選択**
-   - 理由: Layer 2の最適化
-   - 期間: 1-2日
-   - 依存: 変更差分検出
-
-### 🎨 Low Priority（Phase 3-4）
-
-6. **Figma → Story生成強化**
-   - 理由: 開発効率向上（手動でも可能）
-   - 期間: 3-5日
-   - 依存: Storybook完成
-
-7. **PR承認フロー強化**
-   - 理由: 運用改善（基本機能は完成済み）
-   - 期間: 1-2日
-   - 依存: 全体完成
-
----
-
-## 🎯 最初のマイルストーン（1週間目標）
-
-### Goal: Layer 1（Storybook）の完成とChromatic統合
-
-#### タスク
-
-1. ✅ **Day 1**: Storybookセットアップ
-   - 依存関係追加
-   - `.storybook/` 設定
-   - 動作確認（`npm run storybook`）
-
-2. ✅ **Day 2**: サンプルStory作成
-   - `hero` BlockのStory作成
-   - 2-3のVariant作成
-   - ローカルで動作確認
-
-3. ✅ **Day 3**: Chromatic統合（Layer 1）
-   - `chromatic-pr.yml` 更新
-   - Layer 1 + Layer 2並行実行
-   - PRでテスト
-
-4. ✅ **Day 4-5**: テンプレート化
-   - 他のBlockにも適用
-   - ドキュメント整備
-   - ak-edsへの適用検討
+- 🔜 **Interaction Testing（将来追加予定）**
+  - ユーザー操作のシミュレーション
+  - `@storybook/addon-interactions` による自動テスト
+  - Storybook 9.x 安定版リリース後に実装予定
 
 ---
 
@@ -246,63 +96,284 @@ PRマージ (main):
 
 | レイヤー | ツール | 用途 |
 |---------|--------|------|
-| **デザイン** | Figma (MCP) | デザイン取得、Variant定義 |
-| **要件** | Markdown | UserStory、テストシナリオ |
-| **コード生成** | AI (Cursor) | Block実装、Story生成 |
-| **Component Test** | Storybook | UI開発、Visual Regression |
-| **E2E Test** | Playwright | ページレベルVisual Regression |
-| **Visual Regression** | Chromatic | スナップショット比較、Diffレビュー |
-| **CI/CD** | GitHub Actions | 自動テスト、Baseline更新 |
+| **デザイン** | Figma (MCP) | デザイン取得、Variant定義、デザイントークン抽出 |
+| **要件** | Markdown | UserStory、テストシナリオ（オプション） |
+| **コード生成** | AI (Cursor) | Block実装、Story生成、EDS Block Collection準拠 |
+| **Component Test** | Storybook 9.x | UI開発、Visual Regression、A11y テスト |
+| **E2E Test** | Playwright | ページレベル Visual Regression |
+| **Visual Regression** | Chromatic | スナップショット比較、Diffレビュー、Baseline管理 |
+| **CI/CD** | GitHub Actions | 自動テスト、PR コメント、Baseline更新 |
+| **Linting** | ESLint, Stylelint | コード品質チェック |
+
+### 主要な依存関係
+
+```json
+{
+  "devDependencies": {
+    "@chromatic-com/playwright": "^0.12.8",
+    "@chromatic-com/storybook": "^4.1.3",
+    "@playwright/test": "^1.45.3",
+    "@storybook/addon-a11y": "^9.1.17",
+    "@storybook/addon-docs": "^9.1.17",
+    "@storybook/html-vite": "^9.1.17",
+    "chromatic": "^13.3.5",
+    "eslint": "8.57.1",
+    "playwright": "^1.45.3",
+    "storybook": "^9.1.17",
+    "stylelint": "16.26.1"
+  }
+}
+```
 
 ---
 
-## 📚 参考ドキュメント
+## 📂 プロジェクト構成
 
-### 既存ドキュメント
-
-- `ak-eds/.cursorrules` - コード生成ルール
-- `ak-eds/VISUAL-REGRESSION-STRATEGY.md` - VR戦略
-- `ak-eds/BLOCK-GENERATION-GUIDE.md` - Block生成ガイド
-- `my-website/CHROMATIC-WORKFLOW-STRATEGY.md` - ワークフロー戦略
-- `my-website/CHROMATIC-BASELINE-GUIDE.md` - Baseline管理
-
-### 作成予定ドキュメント
-
-- `d2c/GETTING-STARTED.md` - テンプレート利用ガイド
-- `d2c/STORYBOOK-GUIDE.md` - Storybook作成ガイド
-- `d2c/PR-WORKFLOW.md` - PR作成〜承認フロー
+```
+/Users/dmurata/Documents/Dev/d2c/
+  ├── blocks/              # EDS Blocks
+  │   └── {block}/
+  │       ├── {block}.js          # Block 実装
+  │       ├── {block}.css         # Block スタイル
+  │       └── {block}.stories.js  # Storybook Story (Figma Variant 対応)
+  │
+  ├── scripts/
+  │   └── extract-figma-tokens.js # Figma Variables → CSS Custom Properties
+  │
+  ├── tests/
+  │   ├── chromatic.spec.js       # Layer 2 (Playwright E2E)
+  │   └── chromatic-pages.config.json # テスト対象ページ定義
+  │
+  ├── styles/
+  │   ├── styles.css              # グローバルスタイル
+  │   └── design-tokens.css       # Figma から抽出した Design Tokens
+  │
+  ├── .storybook/                 # Storybook 設定
+  │   ├── main.js                 # アドオン設定 (a11y, docs, chromatic)
+  │   └── preview.js              # A11y ルール、Chromatic パラメータ
+  │
+  ├── .github/
+  │   ├── pull_request_template.md        # PR テンプレート
+  │   └── workflows/
+  │       ├── chromatic-two-layer.yml     # Layer 1 + Layer 2 統合
+  │       └── auto-pr-description.yml     # Preview URL 自動生成
+  │
+  ├── tools/sidekick/              # AEM Sidekick 設定
+  │   ├── config.json              # Sidekick 基本設定
+  │   ├── library.html             # Library UI カスタマイズ
+  │   └── library.json             # ブロックカタログ定義
+  │
+  ├── chromatic.config.json        # Chromatic CLI 設定
+  ├── chromatic.config.js          # Playwright Chromatic 設定
+  ├── chromatic-pages.config.json  # E2E テスト対象ページ定義
+  │
+  ├── .cursorrules                 # AI コード生成ルール
+  ├── BLOCK-GENERATION-GUIDE.md    # Block 生成ガイド
+  ├── FIGMA-DESIGN-GUIDELINES.md   # Figma デザインガイドライン
+  ├── FIGMA-VARIANTS-1TO1-DECISION.md # Variant マッピング決定記録
+  ├── QUALITY-TESTING-GUIDE.md     # 品質テスト機能ガイド
+  ├── PR-DESCRIPTION-AUTO-UPDATE-GUIDE.md # PR URL 自動生成ガイド
+  └── VISUAL-REGRESSION-STRATEGY.md # Visual Regression 戦略
+```
 
 ---
 
-## 💡 次のアクション
+## 📚 主要ドキュメント
 
-### 即座に着手できること
+### コード生成
 
-1. **テンプレートプロジェクトの初期化**
-   ```bash
-   cd /Users/dmurata/Documents/Dev/d2c
-   # Storybookセットアップ開始
-   ```
+- `.cursorrules` - AI コード生成ルール（EDS Block Collection 準拠）
+- `BLOCK-GENERATION-GUIDE.md` - Block 生成の詳細ガイド
+- `FIGMA-DESIGN-GUIDELINES.md` - デザイナー向け Figma ガイドライン
+- `FIGMA-VARIANTS-1TO1-DECISION.md` - Figma Variant と Story の 1:1 マッピング決定記録
+- `EDS-BLOCK-COLLECTION-REFERENCE.md` - 標準 Block パターン参照
 
-2. **ak-edsからStorybookブロックを参照**
-   ```bash
-   cd /Users/dmurata/Documents/Customers/AK/ak-eds
-   # 既存のStorybook設定を確認
-   ```
+### Visual Regression Testing
 
-3. **my-websiteのChromatic設定を移植**
-   - `chromatic.config.js`
-   - `chromatic-baseline.yml`
-   - `chromatic-pr.yml`
+- `VISUAL-REGRESSION-STRATEGY.md` - 2層 VR 戦略の詳細
+- `CHROMATIC-PLAYWRIGHT-SETUP.md` - Playwright Chromatic プロジェクト設定
+- `CHROMATIC-PAGES-CONFIG.md` - E2E テスト対象ページ管理
+
+### 品質テスト
+
+- `QUALITY-TESTING-GUIDE.md` - A11y テスト、ドキュメント生成、今後の追加機能
+
+### PR ワークフロー
+
+- `PR-DESCRIPTION-AUTO-UPDATE-GUIDE.md` - Preview URL 自動生成の仕組み
+
+### Figma 連携
+
+- `FIGMA-MCP-QUICKSTART.md` - Figma MCP セットアップクイックスタート
+- `FIGMA-VARIABLES-TO-CSS.md` - Figma Variables 抽出と CSS 変換
+
+---
+
+## 🚀 使い方
+
+### 1. 新しい Block を生成
+
+```bash
+# Figma のみから生成（最もシンプル）
+@figma https://www.figma.com/design/{file-id} Generate EDS Block for "BlockName"
+
+# Figma + UserStory から生成
+@figma https://www.figma.com/design/{file-id}
+@docs/user-stories/block-name.md
+Generate EDS Block for "BlockName"
+```
+
+### 2. Storybook で開発
+
+```bash
+npm run storybook
+# → http://localhost:6006
+```
+
+- **Canvas タブ**: コンポーネントのプレビュー
+- **Accessibility タブ**: A11y チェック結果
+- **Docs タブ**: 自動生成されたドキュメント
+
+### 3. PR を作成
+
+```bash
+git checkout -b feature-new-block
+git add blocks/new-block/
+git commit -m "feat: Add new block"
+git push origin feature-new-block
+gh pr create --title "feat: Add new block" --base develop --web
+```
+
+PR 作成時に自動的に：
+- Preview URL（`aem.page` と `aem.live`）が Description に追加される
+- Layer 1（Storybook）と Layer 2（Playwright）の Chromatic テストが実行される
+- PR コメントに Chromatic Build リンクが投稿される
+
+### 4. Chromatic で Diff を確認
+
+PR コメントのリンクから Chromatic Dashboard へ：
+- 変更された Block の Story を確認（Layer 1）
+- 重要ページのスクリーンショットを確認（Layer 2）
+- 変更を Accept または Reject
+
+### 5. PR をマージ
+
+PR マージ時に自動的に：
+- `develop` ブランチの Chromatic baseline が更新される
+- 次の PR はこの新しい baseline と比較される
+
+---
+
+## 🎯 プロジェクトの現在地
+
+### ✅ 完成している機能
+
+| 機能 | 状態 | ドキュメント |
+|------|------|-------------|
+| Figma MCP 統合 | ✅ | `FIGMA-MCP-QUICKSTART.md` |
+| Figma Design Token 抽出 | ✅ | `FIGMA-VARIABLES-TO-CSS.md` |
+| Block コード生成（Figma のみ） | ✅ | `BLOCK-GENERATION-GUIDE.md` |
+| Block コード生成（Figma + UserStory） | ✅ | `BLOCK-GENERATION-GUIDE.md` |
+| Figma Variant → Storybook Story（1:1） | ✅ | `FIGMA-VARIANTS-1TO1-DECISION.md` |
+| Layer 1: Storybook Visual Regression | ✅ | `VISUAL-REGRESSION-STRATEGY.md` |
+| Layer 2: Playwright E2E Visual Regression | ✅ | `CHROMATIC-PLAYWRIGHT-SETUP.md` |
+| Chromatic 2層統合ワークフロー | ✅ | `.github/workflows/chromatic-two-layer.yml` |
+| PR コメント自動投稿 | ✅ | `chromatic-two-layer.yml` |
+| Baseline 自動更新（develop マージ時） | ✅ | `chromatic-two-layer.yml` |
+| Accessibility Testing (A11y) | ✅ | `QUALITY-TESTING-GUIDE.md` |
+| Documentation Generation | ✅ | `QUALITY-TESTING-GUIDE.md` |
+| PR Description 自動生成（Preview URL） | ✅ | `PR-DESCRIPTION-AUTO-UPDATE-GUIDE.md` |
+| aem-psi-check 対応 | ✅ | `PR-DESCRIPTION-AUTO-UPDATE-GUIDE.md` |
+| ESLint / Stylelint 設定 | ✅ | `.eslintrc.cjs`, `.stylelintrc.json` |
+| Sidekick Library 統合 | ✅ | `tools/sidekick/library.json` |
+
+### 🔜 今後追加予定の機能
+
+| 機能 | 優先度 | 実装時期 |
+|------|--------|---------|
+| Interaction Testing | 高 | Storybook 9.x 安定版リリース後（2026年Q2予定） |
+| Responsive Design Testing | 中 | 必要に応じて |
+| Performance Measurement | 低 | 必要に応じて |
+
+---
+
+## 💡 テンプレートとして使用する方法
+
+このプロジェクト（`d2c`）は、他の AEM EDS プロジェクトのテンプレートとして使用できます。
+
+### 1. プロジェクトをクローン
+
+```bash
+git clone https://github.com/DaichiMURATA/d2c.git your-project-name
+cd your-project-name
+```
+
+### 2. リポジトリ情報を更新
+
+以下のファイルのリポジトリ名と Owner を更新：
+
+- `.github/workflows/chromatic-two-layer.yml`
+- `.github/workflows/auto-pr-description.yml`
+- `.github/pull_request_template.md`
+- `chromatic-pages.config.json`
+- `chromatic.config.js`
+- `tests/chromatic.spec.js`
+- `tools/sidekick/config.json`
+
+### 3. Chromatic プロジェクトを作成
+
+- [Chromatic](https://www.chromatic.com/) でアカウント作成
+- 2つのプロジェクトを作成:
+  - Storybook 用（Layer 1）
+  - Playwright 用（Layer 2）
+- Project Token と App ID を取得
+
+### 4. GitHub Secrets/Variables を設定
+
+**Secrets:**
+- `CHROMATIC_STORYBOOK_TOKEN`
+- `CHROMATIC_PLAYWRIGHT_TOKEN`
+
+**Variables:**
+- `CHROMATIC_STORYBOOK_APP_ID`
+- `CHROMATIC_PLAYWRIGHT_APP_ID`
+
+### 5. Figma アクセストークンを設定
+
+```bash
+export FIGMA_ACCESS_TOKEN="your-figma-token"
+```
+
+### 6. 依存関係をインストール
+
+```bash
+npm install
+```
+
+### 7. Storybook を起動して動作確認
+
+```bash
+npm run storybook
+```
+
+---
+
+## 📝 更新履歴
+
+- **2026-01-15**: aem-psi-check 対応、PR Description 自動生成機能追加
+- **2026-01-15**: Accessibility Testing (A11y) と Documentation Generation 追加
+- **2026-01-15**: Storybook 9.x 互換性修正（`element` → `context` パラメータ）
+- **2026-01-15**: リポジトリ名を `figma-design-to-eds-code` から `d2c` に変更
+- **2026-01-15**: ESLint / Stylelint 設定完了、デフォルトブランチを `develop` に変更
+- **2026-01-09**: Layer 1 (Storybook) と Layer 2 (Playwright) の Chromatic 統合完了
+- **2026-01-09**: Figma Variant → Storybook Story 1:1 マッピング決定
+- **2026-01-08**: Figma Design Token 抽出機能実装
+- **2026-01-08**: Figma MCP 統合完了
+- **2026-01-07**: Block コード生成機能（Figma のみ）実装完了
 
 ---
 
 **プロジェクト**: フロントエンドの不具合撲滅運動  
-**現在地**: Layer 2（Playwright）完成、Layer 1（Storybook）着手準備完了  
-**次のマイルストーン**: Layer 1のChromatic統合（1週間）  
-**最終ゴール**: テンプレートプロジェクトの完成と各プロジェクトへの展開
-
----
-
-**更新日**: 2026-01-09
-
+**テンプレート**: `d2c` (Design to Code)  
+**現在地**: 全機能実装完了、テンプレート化準備完了  
+**最終ゴール**: 各 AEM EDS 構築プロジェクトへの展開と不具合ゼロの実現
