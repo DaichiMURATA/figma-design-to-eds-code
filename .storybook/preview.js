@@ -1,79 +1,56 @@
-import { initialize, mswDecorator } from 'msw-storybook-addon';
-import '../styles/styles.css';
-
-// Initialize MSW
-initialize({
-  onUnhandledRequest: 'warn',
-});
-
-/** @type { import('@storybook/html').Preview } */
+/** @type { import('@storybook/html-vite').Preview } */
 const preview = {
   parameters: {
-    actions: { 
-      disable: true 
+    // アクセシビリティテストのデフォルト設定
+    a11y: {
+      config: {
+        rules: [
+          {
+            // WCAG 2.1 Level AA 準拠
+            id: 'color-contrast',
+            enabled: true,
+          },
+          {
+            // ARIA 属性の検証
+            id: 'aria-*',
+            enabled: true,
+          },
+          {
+            // キーボードナビゲーション
+            id: 'keyboard',
+            enabled: true,
+          },
+        ],
+      },
+      // 違反を自動的に検出してハイライト
+      element: '#storybook-root',
+      manual: false,
     },
+    
+    // アクション（イベントログ）
+    actions: { argTypesRegex: '^on[A-Z].*' },
+    
+    // コントロール（Props の編集）
+    controls: {
+      matchers: {
+        color: /(background|color)$/i,
+        date: /Date$/,
+      },
+    },
+    
+    // ドキュメント生成
     docs: {
-      description: {
-        component: 'EDS Component Documentation',
-      },
+      toc: true,
     },
-    backgrounds: {
-      default: 'light',
-      values: [
-        {
-          name: 'light',
-          value: '#ffffff',
-        },
-        {
-          name: 'dark',
-          value: '#333333',
-        },
-      ],
-    },
-    viewport: {
-      viewports: {
-        mobile: {
-          name: 'Mobile',
-          styles: {
-            width: '375px',
-            height: '667px',
-          },
-        },
-        tablet: {
-          name: 'Tablet',
-          styles: {
-            width: '800px',
-            height: '1024px',
-          },
-        },
-        desktop: {
-          name: 'Desktop',
-          styles: {
-            width: '1200px',
-            height: '800px',
-          },
-        },
-      },
+    
+    // Chromatic 設定
+    chromatic: {
+      // アクセシビリティ違反があってもスナップショットを撮影
+      disableSnapshot: false,
+      // 遅延読み込みの待機時間
+      delay: 300,
     },
   },
-  decorators: [
-    mswDecorator,
-    (story) => {
-      const container = document.createElement('div');
-      container.style.padding = '20px';
-      
-      const storyElement = story();
-      
-      if (storyElement instanceof HTMLElement) {
-        container.appendChild(storyElement);
-      } else {
-        container.innerHTML = storyElement;
-      }
-      
-      return container;
-    },
-  ],
 };
 
 export default preview;
-
