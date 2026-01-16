@@ -15,7 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // 設定ファイルを読み込む
-const configPath = join(__dirname, '..', 'chromatic-pages.config.json');
+const configPath = join(__dirname, '..', 'config', 'chromatic', 'chromatic-pages.config.json');
 const config = JSON.parse(readFileSync(configPath, 'utf-8'));
 
 // 環境変数でbaseURLを上書き可能

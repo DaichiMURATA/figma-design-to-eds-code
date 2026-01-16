@@ -123,7 +123,7 @@
 
 ## デザイン仕様参照
 
-Figma URL: `figma-urls.json` の `components.hero.url` を参照
+Figma URL: `config/figma/figma-urls.json` の `components.hero.url` を参照
 
 ---
 

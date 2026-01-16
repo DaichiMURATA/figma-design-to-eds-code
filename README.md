@@ -112,8 +112,19 @@ d2c/
 ├─ .github/workflows/              # GitHub Actions
 │  └─ chromatic-two-layer.yml      # 2層VRテスト
 │
-├─ eds-spec-config.json            # Living Spec設定
-├─ chromatic.config.json           # Chromatic設定
+├─ config/                         # 設定ファイル
+│  ├─ chromatic/                   # VRテスト設定
+│  │  ├─ chromatic-pages.config.json
+│  │  ├─ chromatic-pages.schema.json
+│  │  └─ chromatic.config.json
+│  ├─ component/                   # DarkAlley設定
+│  │  ├─ component-definition.json
+│  │  ├─ component-filters.json
+│  │  └─ component-models.json
+│  └─ figma/                       # Figma URL管理
+│     └─ figma-urls.json
+│
+├─ chromatic.config.js             # Playwright設定
 └─ package.json                    # npm scripts
 ```
 
@@ -162,7 +173,7 @@ npm run chromatic:storybook
 npm run chromatic:playwright
 ```
 - 設定ファイル管理の全ページテスト
-- `chromatic-pages.config.json`で対象ページ管理
+- `config/chromatic/chromatic-pages.config.json`で対象ページ管理
 
 ### 4. GitHub Actions自動化
 

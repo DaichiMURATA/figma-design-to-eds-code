@@ -49,7 +49,7 @@
   - 自動ドキュメント生成
 
 - ✅ **Layer 2: Playwright E2E Page Testing**
-  - 設定ファイル（`chromatic-pages.config.json`）で管理
+  - 設定ファイル（`config/chromatic/chromatic-pages.config.json`）で管理
   - 事前定義された重要ページのフルページテスト
   - デスクトップ・モバイル両対応
 
@@ -142,7 +142,9 @@
   │
   ├── tests/
   │   ├── chromatic.spec.js       # Layer 2 (Playwright E2E)
-  │   └── chromatic-pages.config.json # テスト対象ページ定義
+  │   └── config/
+  │       └── chromatic/
+  │           └── chromatic-pages.config.json # テスト対象ページ定義
   │
   ├── styles/
   │   ├── styles.css              # グローバルスタイル
@@ -165,7 +167,13 @@
   │
   ├── chromatic.config.json        # Chromatic CLI 設定
   ├── chromatic.config.js          # Playwright Chromatic 設定
-  ├── chromatic-pages.config.json  # E2E テスト対象ページ定義
+  ├── config/
+  │   ├── chromatic/
+  │   │   └── chromatic-pages.config.json  # E2E テスト対象ページ定義
+  │   ├── component/
+  │   │   └── component-definition.json    # DarkAlley Block定義
+  │   └── figma/
+  │       └── figma-urls.json              # Figma URL管理
   │
   ├── .cursorrules                 # AI コード生成ルール
   ├── BLOCK-GENERATION-GUIDE.md    # Block 生成ガイド
@@ -315,7 +323,7 @@ cd your-project-name
 - `.github/workflows/chromatic-two-layer.yml`
 - `.github/workflows/auto-pr-description.yml`
 - `.github/pull_request_template.md`
-- `chromatic-pages.config.json`
+- `config/chromatic/chromatic-pages.config.json`
 - `chromatic.config.js`
 - `tests/chromatic.spec.js`
 - `tools/sidekick/config.json`

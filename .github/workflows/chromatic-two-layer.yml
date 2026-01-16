@@ -142,7 +142,7 @@ jobs:
 
   # ============================================
   # LAYER 2: Playwright E2E Page Testing
-  # chromatic-pages.config.json で定義されたページのみテスト
+  # config/chromatic/chromatic-pages.config.json で定義されたページのみテスト
   # ============================================
   layer2-playwright:
     name: "Layer 2: Playwright E2E Pages (Config-Based)"
@@ -318,7 +318,7 @@ jobs:
                 body += `- ⚠️ Chromatic URL not available\n`;
               }
               body += '- Screenshots captured and available in artifacts\n';
-              body += '- 📄 Test pages defined in `chromatic-pages.config.json`\n';
+              body += '- 📄 Test pages defined in `config/chromatic/chromatic-pages.config.json`\n';
               body += `- Source: \`${{ github.head_ref || github.ref_name }}\`\n`;
               body += `- Target: \`${{ github.base_ref || 'develop' }}\`\n`;
               body += `- Source URL: https://${{ github.head_ref || github.ref_name }}--d2c--daichimurata.aem.live/\n`;
@@ -341,7 +341,7 @@ jobs:
             body += '2. Approve or reject changes\n';
             body += '3. Download artifacts for detailed screenshots\n';
             body += '\n';
-            body += '📝 **Add More Test Pages**: Edit `chromatic-pages.config.json`\n';
+            body += '📝 **Add More Test Pages**: Edit `config/chromatic/chromatic-pages.config.json`\n';
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,
