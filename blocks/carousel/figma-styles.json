@@ -1,0 +1,311 @@
+{
+  "nodeName": "isSingle=false, isMultiple=true, isContent=false, contentPosition=none, contentSize=none",
+  "nodeType": "COMPONENT",
+  "styles": {
+    "layout": {
+      "display": "flex",
+      "flex-direction": "column",
+      "align-items": "center"
+    },
+    "sizing": {
+      "width": 1160,
+      "height": 639
+    }
+  },
+  "children": [
+    {
+      "nodeName": "slider",
+      "nodeType": "FRAME",
+      "styles": {
+        "layout": {
+          "display": "flex",
+          "flex-direction": "column",
+          "justify-content": "center",
+          "align-items": "center"
+        },
+        "sizing": {
+          "width": 1160,
+          "height": 595
+        }
+      },
+      "children": [
+        {
+          "nodeName": "image",
+          "nodeType": "FRAME",
+          "styles": {
+            "sizing": {
+              "width": 1200,
+              "height": 640
+            }
+          },
+          "children": [
+            {
+              "nodeName": "image",
+              "nodeType": "RECTANGLE",
+              "styles": {
+                "sizing": {
+                  "width": 1200,
+                  "height": 640
+                }
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "nodeName": "contents",
+          "nodeType": "FRAME",
+          "styles": {
+            "layout": {
+              "display": "flex",
+              "flex-direction": "row",
+              "justify-content": "space-between",
+              "align-items": "center",
+              "gap": "32px"
+            },
+            "sizing": {
+              "width": 1160,
+              "height": 595
+            },
+            "spacing": {
+              "paddingTop": 0,
+              "paddingRight": 12,
+              "paddingBottom": 0,
+              "paddingLeft": 12
+            },
+            "spacingTokens": {
+              "paddingTop": null,
+              "paddingRight": null,
+              "paddingBottom": null,
+              "paddingLeft": null
+            }
+          },
+          "children": [
+            {
+              "nodeName": "left-icon",
+              "nodeType": "FRAME",
+              "styles": {
+                "layout": {
+                  "display": "flex",
+                  "flex-direction": "column",
+                  "justify-content": "center"
+                },
+                "sizing": {
+                  "width": 49.95912170410156,
+                  "height": 595
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "right-icon",
+              "nodeType": "FRAME",
+              "styles": {
+                "layout": {
+                  "display": "flex",
+                  "flex-direction": "column",
+                  "justify-content": "center"
+                },
+                "sizing": {
+                  "width": 50,
+                  "height": 595
+                }
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nodeName": "indicators",
+      "nodeType": "FRAME",
+      "styles": {
+        "layout": {
+          "display": "flex",
+          "flex-direction": "row",
+          "align-items": "center",
+          "gap": "8px"
+        },
+        "sizing": {
+          "width": 132,
+          "height": 44
+        },
+        "spacing": {
+          "paddingTop": 12,
+          "paddingRight": 0,
+          "paddingBottom": 12,
+          "paddingLeft": 0
+        },
+        "spacingTokens": {
+          "paddingTop": null,
+          "paddingRight": null,
+          "paddingBottom": null,
+          "paddingLeft": null
+        }
+      },
+      "children": [
+        {
+          "nodeName": "indicator",
+          "nodeType": "INSTANCE",
+          "styles": {
+            "sizing": {
+              "width": 20,
+              "height": 20
+            },
+            "cornerRadius": {
+              "value": 999,
+              "token": null
+            }
+          },
+          "children": [
+            {
+              "nodeName": "●",
+              "nodeType": "VECTOR",
+              "styles": {
+                "sizing": {
+                  "width": 16,
+                  "height": 16
+                },
+                "fill": {
+                  "type": "solid",
+                  "color": "rgb(17, 17, 17)",
+                  "token": null
+                }
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "nodeName": "indicator",
+          "nodeType": "INSTANCE",
+          "styles": {
+            "sizing": {
+              "width": 20,
+              "height": 20
+            },
+            "cornerRadius": {
+              "value": 999,
+              "token": null
+            }
+          },
+          "children": [
+            {
+              "nodeName": "●",
+              "nodeType": "VECTOR",
+              "styles": {
+                "sizing": {
+                  "width": 16,
+                  "height": 16
+                },
+                "fill": {
+                  "type": "solid",
+                  "color": "rgb(224, 224, 224)",
+                  "token": null
+                }
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "nodeName": "indicator",
+          "nodeType": "INSTANCE",
+          "styles": {
+            "sizing": {
+              "width": 20,
+              "height": 20
+            },
+            "cornerRadius": {
+              "value": 999,
+              "token": null
+            }
+          },
+          "children": [
+            {
+              "nodeName": "●",
+              "nodeType": "VECTOR",
+              "styles": {
+                "sizing": {
+                  "width": 16,
+                  "height": 16
+                },
+                "fill": {
+                  "type": "solid",
+                  "color": "rgb(224, 224, 224)",
+                  "token": null
+                }
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "nodeName": "indicator",
+          "nodeType": "INSTANCE",
+          "styles": {
+            "sizing": {
+              "width": 20,
+              "height": 20
+            },
+            "cornerRadius": {
+              "value": 999,
+              "token": null
+            }
+          },
+          "children": [
+            {
+              "nodeName": "●",
+              "nodeType": "VECTOR",
+              "styles": {
+                "sizing": {
+                  "width": 16,
+                  "height": 16
+                },
+                "fill": {
+                  "type": "solid",
+                  "color": "rgb(224, 224, 224)",
+                  "token": null
+                }
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "nodeName": "indicator",
+          "nodeType": "INSTANCE",
+          "styles": {
+            "sizing": {
+              "width": 20,
+              "height": 20
+            },
+            "cornerRadius": {
+              "value": 999,
+              "token": null
+            }
+          },
+          "children": [
+            {
+              "nodeName": "●",
+              "nodeType": "VECTOR",
+              "styles": {
+                "sizing": {
+                  "width": 16,
+                  "height": 16
+                },
+                "fill": {
+                  "type": "solid",
+                  "color": "rgb(224, 224, 224)",
+                  "token": null
+                }
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

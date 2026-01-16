@@ -1,337 +1,568 @@
-# EDS Block Generation Rules - Figma MCP Integration Template
+# EDS Block Generation Rules - Complete Automated Workflow
 
-## Automated Block Generation with Figma MCP
+## 🎯 Core Principles
 
-When the user requests to generate a block, use the following workflow:
+1. **Figma Fidelity**: 100% accurate reproduction of Figma designs
+2. **1:1 Variant Mapping**: Every Figma Variant = One Storybook Story
+3. **Design Token Usage**: All styles use CSS Custom Properties (no hardcoded values)
+4. **Automation**: Minimize manual intervention
+5. **Reproducibility**: Same input → Same output
 
-### 1. User Input Options
+---
 
-**Option A: Figma Only (Simplest)**
-```
-@figma https://www.figma.com/design/MJTwyRbE5EVdlci3UIwsut/...?node-id=2-1446
+## 📋 Block Generation Workflow
 
-Generate EDS Block for "Accordion"
-```
-- Extract all requirements from Figma design
-- Component name, variants, design tokens, layout structure
-- Infer accessibility requirements from component structure
+### Phase 1: Figma Analysis & Style Extraction
 
-**Option B: Figma + User Story (Recommended for complex blocks)**
-```
-"Generate hero block:
-- Figma: https://www.figma.com/design/MJTwyRbE5EVdlci3UIwsut/...?node-id=2-1446
-- User Story: docs/user-stories/hero-block.md"
-```
-- Figma provides visual design and variants
-- User Story provides detailed functional and accessibility requirements
-
-**Option C: Figma + Living Specification (Recommended for accurate HTML)**
-```
-@figma https://www.figma.com/design/...?node-id=XXX
-@file blocks/hero/hero.eds-spec.json
-
-Generate EDS Block
-```
-- Figma provides visual design
-- Living Specification provides exact HTML structure from EDS environment
-
-**Option D: Full Integration (Most Accurate)**
-```
-@figma https://www.figma.com/design/...?node-id=XXX
-@file docs/user-stories/hero-block.md
-@file blocks/hero/hero.eds-spec.json
-
-Generate EDS Block
+#### Step 1.1: Identify Component Structure
+```bash
+# When user provides: @figma <url> or --node-id=<id>
+npm run inspect-figma -- --node-id=<component-set-node-id>
 ```
 
-### 2. Automatic Processing
+**Extract**:
+- Component Set structure
+- All Variant Node IDs
+- Variant names and properties
+- Component dimensions (width × height)
 
-When user provides inputs:
-- Access Figma design via MCP `@figma` integration
-- Read User Story markdown file
-- Extract block name from User Story or Figma component name
-- Read `.cursorrules`, `BLOCK-GENERATION-GUIDE.md`, `VISUAL-REGRESSION-STRATEGY.md`
-- Generate block files directly
+**Update**: `config/figma/figma-urls.json` with Variant mapping
 
-### 3. Generation Steps
+#### Step 1.2: Extract Detailed Styles from Each Variant
 
-**Parse User Input:**
-- Figma URL (required): Extract from `@figma` or prompt
-- User Story path (optional): Path to markdown file, if provided
-- Block name (optional): Auto-detect from Figma component name or files
+**For each Variant Node ID**, fetch and extract:
 
-**Information Extraction:**
+```javascript
+// Figma API call
+GET /v1/files/{fileId}/nodes?ids={nodeId}
 
-From Living Specification (if provided) - RECOMMENDED:
-- Exact HTML structure from EDS environment
-- Wrapper and Section classes
-- Content Bus Markdown → HTML conversion result
-- Data attributes (data-block-name, data-block-status)
-- Use `npm run discover-spec -- <block-name>` to auto-extract
-
-From Figma (via MCP) - Always:
-- Component name and Variants
-- Design tokens (colors, typography, spacing)
-- Layout structure and dimensions
-- Interactive elements and states
-- Infer interaction behavior from component structure
-
-From User Story (markdown) - If provided:
-- Detailed functional requirements
-- Specific interaction requirements  
-- Edge case handling
-- Custom accessibility requirements
-- Specific test scenarios
-
-**When User Story is NOT provided:**
-- Infer requirements from Figma component structure
-- Use EDS Block Collection patterns (https://github.com/adobe/aem-block-collection)
-- Reference Adobe's standard block implementations
-- Apply default accessibility standards (WCAG AA)
-- Generate test scenarios based on Figma Variants
-
-**Code Generation:**
-0. **Check for Living Specification** (RECOMMENDED):
-   - Look for `blocks/<name>/<name>.eds-spec.json`
-   - If exists, use as source of truth for HTML structure
-   - If not exists, suggest: `npm run discover-spec -- <block-name>`
-1. Read project context from `BLOCK-GENERATION-GUIDE.md`
-2. Read Visual Regression strategy from `VISUAL-REGRESSION-STRATEGY.md`
-3. Reference EDS Block Collection for standard patterns:
-   - Accordion: https://github.com/adobe/aem-block-collection/tree/main/blocks/accordion
-   - Tabs: https://github.com/adobe/aem-block-collection/tree/main/blocks/tabs
-   - Carousel: https://github.com/adobe/aem-block-collection/tree/main/blocks/carousel
-   - Cards: https://github.com/adobe/aem-block-collection/tree/main/blocks/cards
-4. Check available design tokens (styles/*.css)
-5. Generate the three files directly:
-   - `blocks/<name>/<name>.js`
-   - `blocks/<name>/<name>.css`
-   - `blocks/<name>/<name>.stories.js`
-
-### 4. STORYBOOK STORY GENERATION STRATEGY
-
-**CRITICAL**: Figma is the Single Source of Truth
-
-**Story Generation Rule:**
-```
-Figma Variants count = Storybook Stories count (1:1 mapping)
+// Extract from response:
+{
+  // Layout (Auto Layout)
+  layoutMode: "HORIZONTAL" | "VERTICAL" | "NONE",
+  primaryAxisAlignItems: "MIN" | "CENTER" | "MAX" | "SPACE_BETWEEN",
+  counterAxisAlignItems: "MIN" | "CENTER" | "MAX",
+  itemSpacing: number,
+  paddingTop: number,
+  paddingRight: number,
+  paddingBottom: number,
+  paddingLeft: number,
+  
+  // Visual Properties
+  fills: [{ type, color: { r, g, b, a }, opacity }],
+  strokes: [{ type, color: { r, g, b, a }, strokeWeight }],
+  cornerRadius: number | { topLeft, topRight, bottomLeft, bottomRight },
+  opacity: number,
+  
+  // Effects
+  effects: [
+    { type: "DROP_SHADOW", radius, offset: { x, y }, color, spread }
+  ],
+  
+  // Typography (for TEXT nodes)
+  style: {
+    fontFamily: string,
+    fontSize: number,
+    fontWeight: number,
+    lineHeightPx: number,
+    letterSpacing: number,
+    textAlignHorizontal: "LEFT" | "CENTER" | "RIGHT",
+    textAlignVertical: "TOP" | "CENTER" | "BOTTOM"
+  }
+}
 ```
 
-**What to Generate:**
-- ✅ **One Story per Figma Variant** - No more, no less
-- ✅ **Story names match Figma Variant property values**
-- ✅ **All visual states must be defined in Figma as Variants**
+**Save to**: `blocks/{block}/figma-styles.json`
 
-**What NOT to Generate:**
-- ❌ Do NOT add extra stories for edge cases (minimal/maximum content)
-- ❌ Do NOT add extra stories for interaction states (hover/focus/active) unless in Figma
-- ❌ Do NOT add extra stories for responsive breakpoints unless in Figma
-- ❌ Do NOT add extra stories for error/loading/empty states unless in Figma
+#### Step 1.3: Map Figma Values to Design Tokens
 
-**Figma Design Requirements** (Designer responsibility):
-Each Figma Component Set should include Variants for:
-- All interaction states (default, hover, focus, active, disabled)
-- All content states (error, loading, empty) if applicable
-- All responsive breakpoints (desktop, tablet, mobile) if needed
-- All content variations (minimal, normal, maximum) if needed
+**Process**:
+1. Load global design tokens from `styles/styles.css`
+2. For each extracted style value:
+   - Search for matching token
+   - If found: use `var(--token-name)`
+   - If not found: use literal value + add TODO comment
 
-**Note:** If Figma lacks certain variants (e.g., focus state), this indicates the design needs to be updated in Figma first, NOT added in code generation.
+**Example**:
+```javascript
+// Extracted: paddingTop: 40
+// Global tokens: --spacing-xl: 40px
+// Result: padding-top: var(--spacing-xl);
 
-**Visual Regression Coverage:**
-- Each Story export → One Chromatic snapshot
-- Chromatic captures screenshots of all Story exports
-- Use `parameters.chromatic.viewports: [375, 1200]` for responsive testing within a single Story
-
-### 8. Example User Commands (Updated with Auto-Validation)
-
-**Full Automated Flow:**
-```
-@figma https://www.figma.com/design/ABC123/Components?node-id=100-200
-
-Generate EDS Block for "Hero"
-
-Expected AI behavior:
-1. Generate hero.js, hero.css, hero.stories.js
-2. Instruct user: "Start Storybook: npm run storybook"
-3. Wait for user confirmation
-4. Automatically run: npm run validate-block -- --block=hero --node-id=100-200 --demo
-5. Show iteration-by-iteration comparison and fixes
-6. Report final result
+// Extracted: cornerRadius: 5
+// Global tokens: (no match)
+// Result: border-radius: 5px; /* TODO: Create design token */
 ```
 
-**Manual Validation (if needed):**
-```
-Fix Hero block styling to match Figma
+**Save to**: `blocks/{block}/token-mapping.json`
 
-Expected AI behavior:
-1. Check if Storybook is running
-2. Extract Figma node-id from previous context or ask user
-3. Run validation loop
-4. Report results
+#### Step 1.4: Download All Assets
+
+```bash
+npm run download-all-variants -- --block=<block-name>
 ```
 
-### 9. Post-Generation Steps (Updated)
+**Downloads**:
+- All images from all Variants
+- Saves to `blocks/{block}/assets/`
+- Creates `metadata.json` for each Variant
 
-**Format 1: Figma Only (Simplest)**
-```
-@figma https://www.figma.com/design/ABC123/Components?node-id=100-200
+---
 
-Generate EDS Block for "Accordion"
-```
+### Phase 2: Code Generation
 
-**Format 2: Figma Only with Block Name**
-```
-@figma https://www.figma.com/design/ABC123/Components?node-id=100-200
+#### Step 2.1: Generate CSS
 
-Generate EDS Block for "Hero" with variants: Default, Centered, FullWidth
-```
+**Template Structure**:
+```css
+/**
+ * {Block} Block Styles
+ * Generated from Figma Component: {nodeId}
+ */
 
-**Format 3: Figma + User Story (Recommended for complex blocks)**
-```
-"Generate tabs block:
-- Figma: https://www.figma.com/design/ABC123/Components?node-id=100-200
-- User Story: docs/user-stories/tabs-block.md"
-```
+/* Root Block - from Figma Component Set root */
+.{block} {
+  /* Layout - from Figma Auto Layout */
+  display: {layoutMode === "HORIZONTAL" ? "flex" : "block"};
+  flex-direction: {layoutMode === "HORIZONTAL" ? "row" : "column"};
+  justify-content: {mapAlignment(primaryAxisAlignItems)};
+  align-items: {mapAlignment(counterAxisAlignItems)};
+  gap: var({mapToken(itemSpacing)});
+  
+  /* Spacing - mapped to design tokens */
+  padding: var({mapToken(paddingTop)}) var({mapToken(paddingRight)}) 
+           var({mapToken(paddingBottom)}) var({mapToken(paddingLeft)});
+  margin: 0 auto;
+  
+  /* Sizing - from absoluteBoundingBox */
+  max-width: var(--container-max-width, {width}px);
+  width: 100%;
+  
+  /* Visual - from fills/strokes */
+  background-color: {mapColor(fills[0])};
+  border: {strokes[0] ? mapStroke(strokes[0]) : "none"};
+  border-radius: var({mapToken(cornerRadius)});
+  opacity: {opacity};
+  
+  /* Effects - from effects array */
+  box-shadow: {mapShadow(effects)};
+  
+  /* Position */
+  position: relative;
+}
 
-**Format 4: Template with @figma**
-```
-@figma https://www.figma.com/design/ABC123/Components?node-id=100-200
-@file docs/user-stories/tabs-block.md  # Optional
-
-Generate EDS Block
-```
-
-### 6. Files to Read (In Order of Priority)
-
-1. **Living Specification** (if available) - RECOMMENDED - Exact HTML structure from EDS
-   - `blocks/<name>/<name>.eds-spec.json`
-   - Extract via: `npm run discover-spec -- <block-name>`
-2. **Figma design** (via MCP) - REQUIRED - Visual design and variants
-2. **User Story markdown** (if provided) - OPTIONAL - Detailed requirements and test scenarios
-3. **BLOCK-GENERATION-GUIDE.md** - REQUIRED - Comprehensive block generation rules (PRIMARY REFERENCE)
-4. **VISUAL-REGRESSION-STRATEGY.md** - REQUIRED - Storybook story strategy for Chromatic
-5. **EDS Block Collection** - REQUIRED - Adobe's standard block implementations
-   - GitHub: https://github.com/adobe/aem-block-collection
-   - Use as pattern reference for standard blocks (Accordion, Tabs, Carousel, Cards, etc.)
-6. **Style tokens** (styles/*.css) - Available design tokens
-7. **scripts/aem.js** - Available helper functions
-
-**When User Story is not provided:**
-- Rely on Figma design for all visual and structural requirements
-- Infer behavior from EDS Block Collection standard patterns
-- Map component name to standard EDS block type:
-  - Accordion → Standard expand/collapse pattern
-  - Tabs → Standard tab switching pattern
-  - Carousel → Standard slideshow pattern
-  - Hero → Standard hero section pattern
-- Apply standard accessibility patterns (WCAG AA) for component type
-- Reference AEM.live documentation: https://www.aem.live/docs/
-
-### 7. Post-Generation Visual Validation (AUTOMATIC)
-
-**After generating block files, AUTOMATICALLY run Figma-Storybook validation loop:**
-
-1. **Inform user to start Storybook** (if not running):
-   ```bash
-   npm run storybook
-   ```
-
-2. **Extract Figma node ID** from the provided Figma URL
-
-3. **Run validation loop automatically**:
-   ```bash
-   npm run validate-block -- --block=<name> --node-id=<figma-node-id> --demo
-   ```
-
-4. **The validation loop will**:
-   - ✅ Fetch precise CSS properties from Figma API
-   - ✅ Capture Storybook screenshot and computed styles
-   - ✅ Compare and identify visual/style differences
-   - ✅ Automatically modify CSS to match Figma design
-   - ✅ Wait for hot reload and re-validate
-   - ✅ Repeat until styles match or max iterations (5) reached
-   - ✅ Display detailed logs of all changes made
-
-5. **Report results to user**:
-   - If successful: "✅ Block matches Figma design perfectly!"
-   - If max iterations reached: "⚠️ Some differences remain, manual review recommended"
-   - Show summary of all CSS changes applied
-
-**When to run validation:**
-- ✅ ALWAYS run for new block generation (unless user explicitly skips)
-- ✅ Run when user says "fix styling" or "match Figma"
-- ✅ Run when user reports visual discrepancies
-
-**When to skip validation:**
-- ❌ User explicitly says "skip validation"
-- ❌ Storybook cannot be started
-- ❌ FIGMA_PERSONAL_ACCESS_TOKEN not available
-
-### 8. Example User Commands (Updated with Auto-Validation)
-
-### 9. Post-Generation Steps (Updated)
-
-Automatically remind user and execute:
-
-1. **Files Generated**:
-   - ✅ `blocks/<name>/<name>.js`
-   - ✅ `blocks/<name>/<name>.css`
-   - ✅ `blocks/<name>/<name>.stories.js`
-
-2. **Start Storybook** (if not running):
-   ```bash
-   npm run storybook
-   ```
-
-3. **Run Automatic Visual Validation**:
-   - Extract node-id from Figma URL
-   - Execute: `npm run validate-block -- --block=<name> --node-id=<id> --demo`
-   - Show real-time iteration logs
-   - Display CSS changes made
-   - Report final match status
-
-4. **Next Steps**:
-   - Review generated files
-   - Test block in local EDS: `npm run aem:up`
-   - Create PR for Chromatic Visual Regression testing
-
-## No Manual Copy-Paste Required
-
-The AI should automatically handle:
-- Accessing Figma design via MCP
-- Reading User Story markdown
-- Applying generation rules from guides
-- Generating all block files (JS, CSS, Stories)
-- Providing next steps
-
-Just provide Figma URL and User Story path!
-
-## Project Context
-
-This is a **template project** for EDS Block generation with:
-- **Figma MCP Integration**: Direct access to Figma designs
-- **Two-Layer Visual Regression**: Chromatic + Storybook (Layer 1) + Playwright (Layer 2)
-- **Automated Workflow**: PR-based visual testing with GitHub Actions
-- **Quality Standards**: AA accessibility, Lighthouse 100, production-ready code
-
-## Quick Reference
-
-**Generate Block:**
-```
-@figma {FIGMA_URL}
-@file {USER_STORY_PATH}
-
-Generate EDS Block
+/* Child Elements - from Figma node hierarchy */
+{for each child node:}
+.{block} .{block}-{childNodeName} {
+  {recursively apply same logic}
+}
 ```
 
-**Update Design Tokens:**
+**Automation Function**:
+```javascript
+function generateCSSFromFigmaNode(node, selector, tokenMappings) {
+  const properties = [];
+  
+  // Layout
+  if (node.layoutMode) {
+    properties.push(...convertAutoLayoutToCSS(node));
+  }
+  
+  // Spacing
+  if (node.paddingTop || node.paddingLeft) {
+    const token = findTokenForValue(node.paddingTop, tokenMappings);
+    properties.push(`padding: var(${token}, ${node.paddingTop}px);`);
+  }
+  
+  // Visual
+  if (node.fills) {
+    const color = convertColor(node.fills[0]);
+    const token = findTokenForColor(color, tokenMappings);
+    properties.push(`background-color: var(${token}, ${color});`);
+  }
+  
+  // ... etc for all properties
+  
+  return { selector, properties };
+}
 ```
-@figma {FIGMA_URL}
 
-Extract Variables and update styles/styles.css
+#### Step 2.2: Generate JavaScript
+
+**Follow EDS Block Collection patterns**:
+
+```javascript
+/**
+ * {Block} Block
+ * Generated from Figma Component: {nodeId}
+ * 
+ * Variants: {list variant names}
+ */
+
+export default function decorate(block) {
+  // 1. Extract EDS-generated structure
+  const rows = [...block.children];
+  
+  // 2. Create semantic HTML structure
+  // Based on Figma hierarchy
+  const container = document.createElement('div');
+  container.className = `${block.className.split(' ')[0]}-container`;
+  
+  rows.forEach((row, index) => {
+    const cols = [...row.children];
+    // Process based on Figma variant structure
+    processRow(cols, container, index);
+  });
+  
+  // 3. Add interactivity (if needed)
+  if (hasInteractiveElements(container)) {
+    setupEventHandlers(container);
+  }
+  
+  // 4. Add accessibility attributes
+  enhanceAccessibility(container);
+  
+  // 5. Replace block content
+  block.textContent = '';
+  block.append(container);
+}
 ```
 
-**View Documentation:**
-- BLOCK-GENERATION-GUIDE.md - Block generation rules
-- VISUAL-REGRESSION-STRATEGY.md - Story strategy for Chromatic
-- FIGMA-MCP-INTEGRATION.md - Figma MCP setup and usage
+#### Step 2.3: Generate Storybook Stories
+
+**1:1 Figma Variant → Story mapping**:
+
+```javascript
+/**
+ * {Block} Block Stories
+ * Auto-generated from Figma Variants
+ * 
+ * Figma Component Set: {componentSetNodeId}
+ */
+
+import '../../styles/styles.css';
+import './{block}.css';
+import decorate from './{block}.js';
+
+// Import assets (auto-generated from download-all-variants)
+{for each variant with images:}
+import {variantName}Image from './assets/{variantName}-image.png';
+
+export default {
+  title: 'Blocks/{Block}',
+  tags: ['autodocs'],
+  parameters: {
+    layout: 'fullscreen',
+    chromatic: {
+      viewports: [375, 1200],
+      delay: 500,
+    },
+  },
+};
+
+// Helper to create block HTML
+const createBlockHTML = (config) => {
+  const block = document.createElement('div');
+  block.className = '{block} block';
+  block.setAttribute('data-block-name', '{block}');
+  
+  // Build structure based on config
+  // ...
+  
+  decorate(block);
+  return block;
+};
+
+// Generate Stories from Figma Variants
+{for each variant in config/figma/figma-urls.json:}
+/**
+ * Variant: {variantName}
+ * Figma Node: {variantNodeId}
+ * Properties: {variantProperties}
+ */
+export const {variantName} = {
+  render: () => {
+    return createBlockHTML({
+      images: [{variantName}Image],
+      // ... other config from Figma
+    });
+  },
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/{fileId}?node-id={variantNodeId}',
+    },
+  },
+};
+```
+
+---
+
+### Phase 3: Automated Visual Validation
+
+#### Step 3.1: Run Visual Validation for Each Variant
+
+```bash
+# For each variant in config
+for variantNodeId in $(get-variant-node-ids {block}); do
+  npm run validate-block -- \
+    --block={block} \
+    --node-id=$variantNodeId \
+    --demo
+done
+```
+
+**Validation Process**:
+1. Fetch Figma screenshot (scale=2, Retina)
+2. Get component size from Figma API
+3. Set Storybook viewport to match Figma size
+4. Capture Storybook screenshot (deviceScaleFactor=2)
+5. Compare pixel-by-pixel (pixelmatch)
+6. If diff > threshold (0.1%):
+   - Re-fetch Figma styles
+   - Apply CSS fixes
+   - Wait for hot reload
+   - Repeat (max 5 iterations)
+
+#### Step 3.2: CSS Auto-Fix Logic
+
+**Current**: Heuristic-based fixes
+**Next**: Figma API-driven fixes
+
+```javascript
+async function applyIntelligentFixes(blockName, figmaNodeId, diffPercentage) {
+  // 1. Re-fetch current Figma styles
+  const figmaStyles = await fetchFigmaNodeStyles(figmaNodeId);
+  
+  // 2. Re-fetch current CSS
+  const currentCSS = readFileSync(`blocks/${blockName}/${blockName}.css`, 'utf-8');
+  
+  // 3. Compare and identify missing/incorrect properties
+  const mismatches = compareStylesWithCSS(figmaStyles, currentCSS);
+  
+  // 4. Apply fixes
+  const fixes = mismatches.map(mismatch => ({
+    selector: mismatch.selector,
+    property: mismatch.property,
+    currentValue: mismatch.cssValue,
+    expectedValue: mismatch.figmaValue,
+    token: findTokenForValue(mismatch.figmaValue)
+  }));
+  
+  // 5. Update CSS
+  let updatedCSS = currentCSS;
+  for (const fix of fixes) {
+    updatedCSS = applyCSSFix(updatedCSS, fix);
+  }
+  
+  writeFileSync(`blocks/${blockName}/${blockName}.css`, updatedCSS);
+  
+  return fixes;
+}
+```
+
+---
+
+### Phase 4: Documentation & Integration
+
+#### Step 4.1: Auto-Generate Documentation
+
+```markdown
+# {Block} Block
+
+## Figma Design
+- **Component Set**: [{nodeId}](figma-url)
+- **File**: {fileName}
+- **Last Updated**: {timestamp}
+
+## Variants ({variantCount})
+
+{for each variant:}
+### {VariantName}
+- **Node ID**: {variantNodeId}
+- **Dimensions**: {width} × {height}
+- **Properties**: {variantProperties}
+- **Preview**: ![Storybook]({storybookUrl})
+
+## Design Tokens Used
+{for each token in token-mapping.json:}
+- `{tokenName}`: {value}
+
+## Usage
+\`\`\`html
+<!-- In DarkAlley Document -->
+| {Block} |
+| --- |
+| Content |
+\`\`\`
+
+## Accessibility
+- ✅ Keyboard navigation
+- ✅ Screen reader support
+- ✅ ARIA attributes
+- ✅ Focus management
+
+## Chromatic
+- **Status**: {chromaticStatus}
+- **Last Baseline**: {lastBaseline}
+- **Storybook Build**: [View]({chromaticUrl})
+```
+
+#### Step 4.2: Update Config
+
+```json
+// config/figma/figma-urls.json
+{
+  "components": {
+    "{block}": {
+      "nodeId": "{componentSetNodeId}",
+      "variants": {
+        "{variantName1}": "{variantNodeId1}",
+        "{variantName2}": "{variantNodeId2}"
+      },
+      "status": "validated",
+      "lastGenerated": "{timestamp}",
+      "lastValidated": "{timestamp}",
+      "visualDiff": {
+        "{variantName1}": "2.3%",
+        "{variantName2}": "1.8%"
+      }
+    }
+  }
+}
+```
+
+---
+
+## 🤖 Automation Commands
+
+### Full End-to-End Generation
+```bash
+npm run generate-block -- --figma-node=<component-set-id> --block=<name>
+```
+
+**Executes**:
+1. `inspect-figma`
+2. `extract-styles`
+3. `map-tokens`
+4. `download-all-variants`
+5. `generate-css`
+6. `generate-js`
+7. `generate-stories`
+8. `validate-all-variants`
+9. `generate-docs`
+
+### Individual Commands (for debugging/iteration)
+```bash
+# Analysis
+npm run inspect-figma -- --node-id=<id>
+npm run extract-styles -- --node-id=<id> --block=<name>
+npm run map-tokens -- --block=<name>
+
+# Assets
+npm run download-assets -- --node-id=<id> --block=<name>
+npm run download-all-variants -- --block=<name>
+
+# Code Generation (to be implemented)
+npm run generate-css -- --block=<name>
+npm run generate-js -- --block=<name>
+npm run generate-stories -- --block=<name>
+
+# Validation
+npm run validate-block -- --block=<name> --node-id=<id>
+npm run validate-all-variants -- --block=<name>
+
+# Documentation (to be implemented)
+npm run generate-docs -- --block=<name>
+```
+
+---
+
+## ✅ Success Criteria
+
+### Per Block
+- [ ] All Figma Variants have corresponding Stories (1:1 mapping)
+- [ ] Visual diff < 5% for all Variants
+- [ ] 90%+ of styles use design tokens (not hardcoded)
+- [ ] HTML structure matches EDS specification
+- [ ] All assets downloaded and referenced
+- [ ] Chromatic baseline established
+- [ ] Documentation complete
+
+### Per Variant
+- [ ] Figma Node ID documented
+- [ ] Dimensions match exactly (width, height)
+- [ ] Layout properties match (flex, gap, alignment)
+- [ ] Spacing properties match (padding, margin)
+- [ ] Visual properties match (colors, borders, shadows)
+- [ ] Typography properties match (font, size, weight)
+- [ ] Interactive states work (hover, focus, active)
+- [ ] Responsive behavior correct
+
+---
+
+## 📁 File Structure (Auto-Generated)
+
+```
+blocks/{block}/
+├── {block}.js                      # Block logic
+├── {block}.css                     # Block styles (token-based)
+├── {block}.stories.js              # Storybook stories (all variants)
+├── {block}.md                      # Documentation
+├── figma-styles.json               # Extracted Figma styles
+├── token-mapping.json              # Figma value → CSS token mapping
+└── assets/
+    ├── metadata.json               # Asset registry
+    ├── {variant1}-image-1.png      # Downloaded images
+    ├── {variant1}-image-2.png
+    ├── {variant2}-image-1.png
+    └── ...
+```
+
+---
+
+## 🔄 Regeneration & Updates
+
+When Figma design changes:
+
+1. **Detect Change**: Webhook or manual trigger
+2. **Re-extract**: `npm run extract-styles -- --node-id=<id> --block=<name>`
+3. **Compare**: Diff old vs new `figma-styles.json`
+4. **Re-generate**: `npm run generate-css -- --block=<name>`
+5. **Re-validate**: `npm run validate-all-variants -- --block=<name>`
+6. **Create PR**: Review and approve changes
+7. **Update Baseline**: Merge to main
+
+---
+
+## 🎯 Current Implementation Status
+
+### ✅ Implemented
+- Figma Node Inspector
+- Figma Assets Downloader
+- Automated Visual Validation (pixel-by-pixel)
+- Storybook Screenshot Capture
+- Variant → Story mapping
+
+### 🚧 In Progress
+- Figma Styles Extraction (detailed)
+- Design Token Mapping
+- CSS Auto-Generation
+- JS Auto-Generation
+- Stories Auto-Generation
+
+### 📋 Planned
+- Vision LLM Integration
+- Element-Level Validation
+- Full End-to-End Command
+- Documentation Auto-Generation
+- Figma Webhook Integration
+
+---
+
+## 📖 Reference Documents
+
+- **Complete Workflow**: `docs/BLOCK-GENERATION-COMPLETE-WORKFLOW.md`
+- **Visual Validation**: `docs/FIGMA-STORYBOOK-AUTO-VALIDATION-COMPLETE.md`
+- **Chromatic Strategy**: `ROADMAP.md`
+- **Quick Start**: `QUICKSTART.md`

@@ -18,6 +18,7 @@
     "build-storybook": "storybook build",
     "validate-block": "node scripts/compare-figma-storybook.js",
     "inspect-figma": "node scripts/inspect-figma-nodes.js",
+    "extract-styles": "node scripts/extract-figma-styles.js",
     "download-assets": "node scripts/download-figma-assets.js",
     "download-all-variants": "node scripts/download-all-variant-assets.js",
     "chromatic:storybook": "npx chromatic --project-token=${CHROMATIC_STORYBOOK_TOKEN}",
