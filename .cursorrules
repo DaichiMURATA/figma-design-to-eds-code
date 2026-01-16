@@ -30,6 +30,8 @@ npm run inspect-figma -- --node-id=<component-set-node-id>
 
 #### Step 1.2: Extract Detailed Styles from Each Variant
 
+**Critical Rule**: If a Figma property uses a Variable (Design Token), extract the **variable reference**, NOT the computed value.
+
 **For each Variant Node ID**, fetch and extract:
 
 ```javascript
@@ -38,21 +40,28 @@ GET /v1/files/{fileId}/nodes?ids={nodeId}
 
 // Extract from response:
 {
+  // IMPORTANT: Check boundVariables first
+  boundVariables: {
+    fills: [{ id: "VariableID:123" }],           // → Use variable reference
+    paddingTop: { id: "VariableID:456" },        // → Use variable reference
+    cornerRadius: { id: "VariableID:789" },      // → Use variable reference
+  },
+  
   // Layout (Auto Layout)
   layoutMode: "HORIZONTAL" | "VERTICAL" | "NONE",
   primaryAxisAlignItems: "MIN" | "CENTER" | "MAX" | "SPACE_BETWEEN",
   counterAxisAlignItems: "MIN" | "CENTER" | "MAX",
-  itemSpacing: number,
-  paddingTop: number,
-  paddingRight: number,
-  paddingBottom: number,
-  paddingLeft: number,
+  itemSpacing: number,                           // Check boundVariables first!
+  paddingTop: number,                            // Check boundVariables first!
+  paddingRight: number,                          // Check boundVariables first!
+  paddingBottom: number,                         // Check boundVariables first!
+  paddingLeft: number,                           // Check boundVariables first!
   
   // Visual Properties
-  fills: [{ type, color: { r, g, b, a }, opacity }],
-  strokes: [{ type, color: { r, g, b, a }, strokeWeight }],
-  cornerRadius: number | { topLeft, topRight, bottomLeft, bottomRight },
-  opacity: number,
+  fills: [{ type, color: { r, g, b, a }, opacity }],  // Check boundVariables first!
+  strokes: [{ type, color: { r, g, b, a }, strokeWeight }],  // Check boundVariables first!
+  cornerRadius: number | { topLeft, topRight, bottomLeft, bottomRight },  // Check boundVariables first!
+  opacity: number,                               // Check boundVariables first!
   
   // Effects
   effects: [
@@ -61,16 +70,21 @@ GET /v1/files/{fileId}/nodes?ids={nodeId}
   
   // Typography (for TEXT nodes)
   style: {
-    fontFamily: string,
-    fontSize: number,
-    fontWeight: number,
-    lineHeightPx: number,
-    letterSpacing: number,
+    fontFamily: string,                          // Check boundVariables first!
+    fontSize: number,                            // Check boundVariables first!
+    fontWeight: number,                          // Check boundVariables first!
+    lineHeightPx: number,                        // Check boundVariables first!
+    letterSpacing: number,                       // Check boundVariables first!
     textAlignHorizontal: "LEFT" | "CENTER" | "RIGHT",
     textAlignVertical: "TOP" | "CENTER" | "BOTTOM"
   }
 }
 ```
+
+**Extraction Priority**:
+1. **If `boundVariables` exists for a property**: Use variable reference (e.g., `var(--spacing-xl)`)
+2. **If no `boundVariables`**: Search for matching token in `styles.css` by value
+3. **If no match**: Use literal value + add TODO comment
 
 **Save to**: `blocks/{block}/figma-styles.json`
 

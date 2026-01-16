@@ -36,6 +36,74 @@ function loadDesignTokens() {
   return tokens;
 }
 
+// Load Figma Variables (design tokens) mapping
+async function loadFigmaVariables() {
+  if (!FIGMA_TOKEN) {
+    return {};
+  }
+  
+  try {
+    const url = `${FIGMA_API_BASE}/files/${FIGMA_FILE_ID}/variables/local`;
+    const response = await fetch(url, {
+      headers: { 'X-Figma-Token': FIGMA_TOKEN }
+    });
+    
+    if (!response.ok) {
+      console.warn('⚠️  Could not fetch Figma Variables, falling back to value matching');
+      return {};
+    }
+    
+    const data = await response.json();
+    const variableMap = {};
+    
+    // Map Figma Variable ID to Variable Name
+    if (data.meta && data.meta.variables) {
+      Object.entries(data.meta.variables).forEach(([id, variable]) => {
+        variableMap[id] = {
+          name: variable.name,
+          type: variable.resolvedType,
+          value: variable.valuesByMode ? Object.values(variable.valuesByMode)[0] : null
+        };
+      });
+    }
+    
+    return variableMap;
+  } catch (error) {
+    console.warn('⚠️  Error loading Figma Variables:', error.message);
+    return {};
+  }
+}
+
+// Get CSS token name from Figma Variable ID
+function getTokenFromVariableId(variableId, figmaVariables, tokens) {
+  if (!variableId || !figmaVariables[variableId]) {
+    return null;
+  }
+  
+  const variable = figmaVariables[variableId];
+  const variableName = variable.name;
+  
+  // Try to find matching CSS token by name
+  // Figma variable names often map to CSS token names
+  // e.g., "spacing/xl" → "--spacing-xl"
+  const tokenName = variableName.toLowerCase().replace(/[\/\s]+/g, '-');
+  
+  if (tokens[tokenName]) {
+    return `--${tokenName}`;
+  }
+  
+  // Try common prefixes
+  const prefixes = ['', 'color-', 'spacing-', 'border-radius-', 'font-'];
+  for (const prefix of prefixes) {
+    const candidate = `${prefix}${tokenName}`;
+    if (tokens[candidate]) {
+      return `--${candidate}`;
+    }
+  }
+  
+  return null;
+}
+
 // Convert Figma color to CSS
 function convertColor(color, opacity = 1) {
   const r = Math.round(color.r * 255);
@@ -115,7 +183,7 @@ function convertAutoLayoutToCSS(node) {
 }
 
 // Extract styles from a Figma node
-async function extractStylesFromNode(node, tokens, depth = 0) {
+async function extractStylesFromNode(node, tokens, figmaVariables, depth = 0) {
   const styles = {
     nodeName: node.name,
     nodeType: node.type,
@@ -137,7 +205,7 @@ async function extractStylesFromNode(node, tokens, depth = 0) {
     };
   }
   
-  // Spacing
+  // Spacing - CHECK boundVariables FIRST
   if (node.paddingTop !== undefined || node.paddingLeft !== undefined) {
     const paddingTop = node.paddingTop || 0;
     const paddingRight = node.paddingRight || 0;
@@ -151,47 +219,82 @@ async function extractStylesFromNode(node, tokens, depth = 0) {
       paddingLeft,
     };
     
-    // Try to find matching tokens
+    // Check if Figma Variables are bound
+    const boundVars = node.boundVariables || {};
     styles.styles.spacingTokens = {
-      paddingTop: findTokenForValue(`${paddingTop}px`, tokens, 'spacing'),
-      paddingRight: findTokenForValue(`${paddingRight}px`, tokens, 'spacing'),
-      paddingBottom: findTokenForValue(`${paddingBottom}px`, tokens, 'spacing'),
-      paddingLeft: findTokenForValue(`${paddingLeft}px`, tokens, 'spacing'),
+      paddingTop: boundVars.paddingTop 
+        ? getTokenFromVariableId(boundVars.paddingTop.id, figmaVariables, tokens)
+        : findTokenForValue(`${paddingTop}px`, tokens, 'spacing'),
+      paddingRight: boundVars.paddingRight
+        ? getTokenFromVariableId(boundVars.paddingRight.id, figmaVariables, tokens)
+        : findTokenForValue(`${paddingRight}px`, tokens, 'spacing'),
+      paddingBottom: boundVars.paddingBottom
+        ? getTokenFromVariableId(boundVars.paddingBottom.id, figmaVariables, tokens)
+        : findTokenForValue(`${paddingBottom}px`, tokens, 'spacing'),
+      paddingLeft: boundVars.paddingLeft
+        ? getTokenFromVariableId(boundVars.paddingLeft.id, figmaVariables, tokens)
+        : findTokenForValue(`${paddingLeft}px`, tokens, 'spacing'),
+    };
+    
+    // Mark if variable is from Figma
+    styles.styles.spacingSource = {
+      paddingTop: boundVars.paddingTop ? 'figma-variable' : 'value-match',
+      paddingRight: boundVars.paddingRight ? 'figma-variable' : 'value-match',
+      paddingBottom: boundVars.paddingBottom ? 'figma-variable' : 'value-match',
+      paddingLeft: boundVars.paddingLeft ? 'figma-variable' : 'value-match',
     };
   }
   
-  // Visual - Fills (background)
+  // Visual - Fills (background) - CHECK boundVariables FIRST
   if (node.fills && node.fills.length > 0 && node.fills[0].visible !== false) {
     const fill = node.fills[0];
     if (fill.type === 'SOLID') {
       const color = convertColor(fill.color, fill.opacity);
+      const boundVars = node.boundVariables || {};
+      const fillToken = boundVars.fills && boundVars.fills[0]
+        ? getTokenFromVariableId(boundVars.fills[0].id, figmaVariables, tokens)
+        : findTokenForValue(color, tokens, 'color');
+      
       styles.styles.fill = {
         type: 'solid',
         color,
-        token: findTokenForValue(color, tokens, 'color'),
+        token: fillToken,
+        source: boundVars.fills && boundVars.fills[0] ? 'figma-variable' : 'value-match',
       };
     }
   }
   
-  // Visual - Strokes (border)
+  // Visual - Strokes (border) - CHECK boundVariables FIRST
   if (node.strokes && node.strokes.length > 0 && node.strokes[0].visible !== false) {
     const stroke = node.strokes[0];
     if (stroke.type === 'SOLID') {
       const color = convertColor(stroke.color, stroke.opacity);
+      const boundVars = node.boundVariables || {};
+      const strokeToken = boundVars.strokes && boundVars.strokes[0]
+        ? getTokenFromVariableId(boundVars.strokes[0].id, figmaVariables, tokens)
+        : findTokenForValue(color, tokens, 'color');
+      
       styles.styles.stroke = {
         type: 'solid',
         color,
         strokeWeight: node.strokeWeight,
-        token: findTokenForValue(color, tokens, 'color'),
+        token: strokeToken,
+        source: boundVars.strokes && boundVars.strokes[0] ? 'figma-variable' : 'value-match',
       };
     }
   }
   
-  // Corner Radius
+  // Corner Radius - CHECK boundVariables FIRST
   if (node.cornerRadius !== undefined) {
+    const boundVars = node.boundVariables || {};
+    const radiusToken = boundVars.cornerRadius
+      ? getTokenFromVariableId(boundVars.cornerRadius.id, figmaVariables, tokens)
+      : findTokenForValue(`${node.cornerRadius}px`, tokens, 'border-radius');
+    
     styles.styles.cornerRadius = {
       value: node.cornerRadius,
-      token: findTokenForValue(`${node.cornerRadius}px`, tokens, 'border-radius'),
+      token: radiusToken,
+      source: boundVars.cornerRadius ? 'figma-variable' : 'value-match',
     };
   } else if (node.rectangleCornerRadii) {
     styles.styles.cornerRadius = {
@@ -220,8 +323,10 @@ async function extractStylesFromNode(node, tokens, depth = 0) {
       }));
   }
   
-  // Typography (for TEXT nodes)
+  // Typography (for TEXT nodes) - CHECK boundVariables FIRST
   if (node.type === 'TEXT' && node.style) {
+    const boundVars = node.boundVariables || {};
+    
     styles.styles.typography = {
       fontFamily: node.style.fontFamily,
       fontSize: node.style.fontSize,
@@ -232,12 +337,25 @@ async function extractStylesFromNode(node, tokens, depth = 0) {
       textAlignHorizontal: node.style.textAlignHorizontal,
       textAlignVertical: node.style.textAlignVertical,
     };
+    
+    // Check for variable-bound typography properties
+    styles.styles.typographyTokens = {
+      fontSize: boundVars.fontSize
+        ? getTokenFromVariableId(boundVars.fontSize.id, figmaVariables, tokens)
+        : findTokenForValue(`${node.style.fontSize}px`, tokens, 'font-size'),
+      fontWeight: boundVars.fontWeight
+        ? getTokenFromVariableId(boundVars.fontWeight.id, figmaVariables, tokens)
+        : null,
+      lineHeight: boundVars.lineHeight
+        ? getTokenFromVariableId(boundVars.lineHeight.id, figmaVariables, tokens)
+        : null,
+    };
   }
   
   // Recursively process children (limit depth to avoid excessive nesting)
   if (node.children && depth < 3) {
     styles.children = await Promise.all(
-      node.children.map(child => extractStylesFromNode(child, tokens, depth + 1))
+      node.children.map(child => extractStylesFromNode(child, tokens, figmaVariables, depth + 1))
     );
   }
   
@@ -258,6 +376,11 @@ async function extractFigmaStyles(nodeId, blockName) {
   console.log('📥 Loading design tokens from styles.css...');
   const tokens = loadDesignTokens();
   console.log(`   Found ${Object.keys(tokens).length} tokens\n`);
+  
+  // Load Figma Variables (for variable binding detection)
+  console.log('📥 Loading Figma Variables...');
+  const figmaVariables = await loadFigmaVariables();
+  console.log(`   Found ${Object.keys(figmaVariables).length} Figma Variables\n`);
   
   // Fetch node data from Figma
   console.log('📥 Fetching Figma node data...');
@@ -285,7 +408,7 @@ async function extractFigmaStyles(nodeId, blockName) {
   
   // Extract styles
   console.log('🔍 Extracting styles...');
-  const extractedStyles = await extractStylesFromNode(nodeData.document, tokens);
+  const extractedStyles = await extractStylesFromNode(nodeData.document, tokens, figmaVariables);
   
   // Save to file
   const outputDir = join(__dirname, '..', 'blocks', blockName);
@@ -304,6 +427,27 @@ async function extractFigmaStyles(nodeId, blockName) {
   console.log(`   Node Type: ${extractedStyles.nodeType}`);
   console.log(`   Style Categories: ${Object.keys(extractedStyles.styles).join(', ')}`);
   console.log(`   Child Nodes: ${extractedStyles.children.length}\n`);
+  
+  // Count variable-bound properties
+  let variableBoundCount = 0;
+  let valueMatchCount = 0;
+  
+  function countSources(obj) {
+    if (obj && typeof obj === 'object') {
+      if (obj.source === 'figma-variable') variableBoundCount++;
+      if (obj.source === 'value-match') valueMatchCount++;
+      Object.values(obj).forEach(val => {
+        if (typeof val === 'object') countSources(val);
+      });
+    }
+  }
+  
+  countSources(extractedStyles);
+  
+  console.log('📊 Token Source Analysis:');
+  console.log(`   From Figma Variables: ${variableBoundCount}`);
+  console.log(`   From Value Matching: ${valueMatchCount}`);
+  console.log(`   Total Design Tokens: ${variableBoundCount + valueMatchCount}\n`);
   
   return extractedStyles;
 }

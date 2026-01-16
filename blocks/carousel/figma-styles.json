@@ -78,6 +78,12 @@
               "paddingRight": null,
               "paddingBottom": null,
               "paddingLeft": null
+            },
+            "spacingSource": {
+              "paddingTop": "value-match",
+              "paddingRight": "figma-variable",
+              "paddingBottom": "value-match",
+              "paddingLeft": "figma-variable"
             }
           },
           "children": [
@@ -142,6 +148,12 @@
           "paddingRight": null,
           "paddingBottom": null,
           "paddingLeft": null
+        },
+        "spacingSource": {
+          "paddingTop": "figma-variable",
+          "paddingRight": "value-match",
+          "paddingBottom": "figma-variable",
+          "paddingLeft": "value-match"
         }
       },
       "children": [
@@ -155,7 +167,8 @@
             },
             "cornerRadius": {
               "value": 999,
-              "token": null
+              "token": null,
+              "source": "value-match"
             }
           },
           "children": [
@@ -170,7 +183,8 @@
                 "fill": {
                   "type": "solid",
                   "color": "rgb(17, 17, 17)",
-                  "token": null
+                  "token": null,
+                  "source": "figma-variable"
                 }
               },
               "children": []
@@ -187,7 +201,8 @@
             },
             "cornerRadius": {
               "value": 999,
-              "token": null
+              "token": null,
+              "source": "value-match"
             }
           },
           "children": [
@@ -202,7 +217,8 @@
                 "fill": {
                   "type": "solid",
                   "color": "rgb(224, 224, 224)",
-                  "token": null
+                  "token": null,
+                  "source": "figma-variable"
                 }
               },
               "children": []
@@ -219,7 +235,8 @@
             },
             "cornerRadius": {
               "value": 999,
-              "token": null
+              "token": null,
+              "source": "value-match"
             }
           },
           "children": [
@@ -234,7 +251,8 @@
                 "fill": {
                   "type": "solid",
                   "color": "rgb(224, 224, 224)",
-                  "token": null
+                  "token": null,
+                  "source": "figma-variable"
                 }
               },
               "children": []
@@ -251,7 +269,8 @@
             },
             "cornerRadius": {
               "value": 999,
-              "token": null
+              "token": null,
+              "source": "value-match"
             }
           },
           "children": [
@@ -266,7 +285,8 @@
                 "fill": {
                   "type": "solid",
                   "color": "rgb(224, 224, 224)",
-                  "token": null
+                  "token": null,
+                  "source": "figma-variable"
                 }
               },
               "children": []
@@ -283,7 +303,8 @@
             },
             "cornerRadius": {
               "value": 999,
-              "token": null
+              "token": null,
+              "source": "value-match"
             }
           },
           "children": [
@@ -298,7 +319,8 @@
                 "fill": {
                   "type": "solid",
                   "color": "rgb(224, 224, 224)",
-                  "token": null
+                  "token": null,
+                  "source": "figma-variable"
                 }
               },
               "children": []
