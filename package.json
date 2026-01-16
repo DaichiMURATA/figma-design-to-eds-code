@@ -16,6 +16,7 @@
     "aem:down": "aem down",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "validate-block": "node scripts/compare-figma-storybook.js",
     "chromatic:storybook": "npx chromatic --project-token=${CHROMATIC_STORYBOOK_TOKEN}",
     "test:chromatic": "npx playwright test --config=chromatic.config.js",
     "chromatic:playwright": "npx chromatic --playwright --project-token=${CHROMATIC_PLAYWRIGHT_TOKEN}"

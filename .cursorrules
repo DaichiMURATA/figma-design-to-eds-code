@@ -142,7 +142,35 @@ Each Figma Component Set should include Variants for:
 - Chromatic captures screenshots of all Story exports
 - Use `parameters.chromatic.viewports: [375, 1200]` for responsive testing within a single Story
 
-### 5. Example User Commands
+### 8. Example User Commands (Updated with Auto-Validation)
+
+**Full Automated Flow:**
+```
+@figma https://www.figma.com/design/ABC123/Components?node-id=100-200
+
+Generate EDS Block for "Hero"
+
+Expected AI behavior:
+1. Generate hero.js, hero.css, hero.stories.js
+2. Instruct user: "Start Storybook: npm run storybook"
+3. Wait for user confirmation
+4. Automatically run: npm run validate-block -- --block=hero --node-id=100-200 --demo
+5. Show iteration-by-iteration comparison and fixes
+6. Report final result
+```
+
+**Manual Validation (if needed):**
+```
+Fix Hero block styling to match Figma
+
+Expected AI behavior:
+1. Check if Storybook is running
+2. Extract Figma node-id from previous context or ask user
+3. Run validation loop
+4. Report results
+```
+
+### 9. Post-Generation Steps (Updated)
 
 **Format 1: Figma Only (Simplest)**
 ```
@@ -199,14 +227,73 @@ Generate EDS Block
 - Apply standard accessibility patterns (WCAG AA) for component type
 - Reference AEM.live documentation: https://www.aem.live/docs/
 
-### 7. Post-Generation Steps
+### 7. Post-Generation Visual Validation (AUTOMATIC)
 
-Automatically remind user:
-1. Review generated files
-2. Run Storybook locally: `npm run storybook`
-3. Verify Visual Regression stories cover all Figma variants
-4. Test accessibility and responsiveness
-5. Create PR for Chromatic Visual Regression testing
+**After generating block files, AUTOMATICALLY run Figma-Storybook validation loop:**
+
+1. **Inform user to start Storybook** (if not running):
+   ```bash
+   npm run storybook
+   ```
+
+2. **Extract Figma node ID** from the provided Figma URL
+
+3. **Run validation loop automatically**:
+   ```bash
+   npm run validate-block -- --block=<name> --node-id=<figma-node-id> --demo
+   ```
+
+4. **The validation loop will**:
+   - ✅ Fetch precise CSS properties from Figma API
+   - ✅ Capture Storybook screenshot and computed styles
+   - ✅ Compare and identify visual/style differences
+   - ✅ Automatically modify CSS to match Figma design
+   - ✅ Wait for hot reload and re-validate
+   - ✅ Repeat until styles match or max iterations (5) reached
+   - ✅ Display detailed logs of all changes made
+
+5. **Report results to user**:
+   - If successful: "✅ Block matches Figma design perfectly!"
+   - If max iterations reached: "⚠️ Some differences remain, manual review recommended"
+   - Show summary of all CSS changes applied
+
+**When to run validation:**
+- ✅ ALWAYS run for new block generation (unless user explicitly skips)
+- ✅ Run when user says "fix styling" or "match Figma"
+- ✅ Run when user reports visual discrepancies
+
+**When to skip validation:**
+- ❌ User explicitly says "skip validation"
+- ❌ Storybook cannot be started
+- ❌ FIGMA_PERSONAL_ACCESS_TOKEN not available
+
+### 8. Example User Commands (Updated with Auto-Validation)
+
+### 9. Post-Generation Steps (Updated)
+
+Automatically remind user and execute:
+
+1. **Files Generated**:
+   - ✅ `blocks/<name>/<name>.js`
+   - ✅ `blocks/<name>/<name>.css`
+   - ✅ `blocks/<name>/<name>.stories.js`
+
+2. **Start Storybook** (if not running):
+   ```bash
+   npm run storybook
+   ```
+
+3. **Run Automatic Visual Validation**:
+   - Extract node-id from Figma URL
+   - Execute: `npm run validate-block -- --block=<name> --node-id=<id> --demo`
+   - Show real-time iteration logs
+   - Display CSS changes made
+   - Report final match status
+
+4. **Next Steps**:
+   - Review generated files
+   - Test block in local EDS: `npm run aem:up`
+   - Create PR for Chromatic Visual Regression testing
 
 ## No Manual Copy-Paste Required
 

@@ -145,7 +145,57 @@ Figmaデザインから直接情報を取得：
 Generate EDS Block
 ```
 
-### 2. Living Specification
+### 2. 自動Visual Validation（NEW!）
+
+**Figma デザインと Storybook 実装を自動比較・修正**：
+
+```bash
+# Block生成後、自動的に実行される
+npm run validate-block -- --block=hero --node-id=2-1446 --demo
+```
+
+**処理フロー**:
+1. ✅ Figma API から正確な CSS プロパティ取得
+2. ✅ Storybook の実装をキャプチャ
+3. ✅ スタイル差異を自動検出
+4. ✅ CSS を自動修正してFigmaに一致させる
+5. ✅ ホットリロード後に再検証
+6. ✅ 一致するまで自動的に繰り返し（最大5回）
+
+**デモ出力例**:
+```
+📍 Iteration 1/5
+📥 Fetching Figma styles...
+📸 Capturing Storybook...
+🔍 Comparing styles...
+⚠️  Found 3 difference(s):
+   ❌ backgroundColor:
+      Figma:     "rgb(26, 73, 137)"
+      Storybook: "rgb(255, 255, 255)"
+   ❌ fontSize:
+      Figma:     "48px"
+      Storybook: "32px"
+🔧 Applying 3 fixes to hero.css...
+✅ Fixes applied
+⏳ Waiting for hot reload...
+
+📍 Iteration 2/5
+✅ All styles match! 🎉
+```
+
+### 3. Living Specification
+
+EDS環境から正確なHTML構造を抽出：
+
+```bash
+# 自動検出
+npm run discover-spec -- hero
+
+# 手動指定
+npm run extract-eds-spec -- hero /test-pages/hero-test
+```
+
+### 3. Living Specification
 
 EDS環境から正確なHTML構造を抽出：
 
@@ -159,7 +209,16 @@ npm run extract-eds-spec -- hero /test-pages/hero-test
 
 生成: `blocks/hero/hero.eds-spec.json`
 
-### 3. Visual Regression Testing (2層戦略)
+### 4. Visual Regression Testing (2層戦略)
+
+#### Layer 1: Storybook (Component Level)
+```bash
+npm run chromatic:storybook
+```
+- 変更されたBlockのみテスト
+- TurboSnap自動検出
+
+### 4. Visual Regression Testing (2層戦略)
 
 #### Layer 1: Storybook (Component Level)
 ```bash
@@ -175,7 +234,7 @@ npm run chromatic:playwright
 - 設定ファイル管理の全ページテスト
 - `config/chromatic/chromatic-pages.config.json`で対象ページ管理
 
-### 4. GitHub Actions自動化
+### 5. GitHub Actions自動化
 
 PR作成時に自動実行：
 - ✅ 2層Visual Regression Test
@@ -222,9 +281,46 @@ CHROMATIC_STORYBOOK_APP_ID=your-storybook-app-id
 CHROMATIC_PLAYWRIGHT_APP_ID=your-playwright-app-id
 ```
 
+### 5. GitHub Actions自動化
+
+PR作成時に自動実行：
+- ✅ 2層Visual Regression Test
+- ✅ PR CommentにChromatic Build URL投稿
+- ✅ PR merge時にBaseline自動更新
+
 ---
 
-## 🎬 使い方
+## 🚀 使い方
+
+### Block生成（完全自動フロー）
+
+```bash
+# 1. Cursorで実行
+@figma https://www.figma.com/design/FILE_ID/...?node-id=NODE_ID
+Generate EDS Block for "Hero"
+
+# 2. AIが自動実行:
+#    - Block コード生成 (JS/CSS/Stories)
+#    - Storybook 起動確認
+#    - Visual Validation ループ実行
+#    - Figma と完全一致するまで CSS 自動修正
+
+# 3. 完了！Figmaデザインと完全一致
+```
+
+### 手動Visual Validation（必要に応じて）
+
+```bash
+# Storybook起動
+npm run storybook
+
+# 別ターミナルで検証実行
+npm run validate-block -- --block=hero --node-id=2-1446 --demo
+```
+
+---
+
+## 🎬 使い方（旧フロー - 参考）
 
 ### Block生成（推奨フロー）
 
