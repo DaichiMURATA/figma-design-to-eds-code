@@ -1,5 +1,32 @@
 # Vision LLM Integration Guide
 
+⚠️ **SECURITY WARNING / セキュリティ警告** ⚠️
+
+**For Enterprise/Business Use:**
+- This feature sends screenshots to **external AI services** (Anthropic/OpenAI)
+- Screenshots may contain **proprietary designs, confidential information**
+- Before using, verify compliance with your organization's:
+  - Data Privacy Policy
+  - Security Guidelines
+  - Terms of Service
+  - Client NDAs
+
+**企業・ビジネス利用の場合:**
+- この機能はスクリーンショットを**外部AIサービス**（Anthropic/OpenAI）に送信します
+- スクリーンショットには**機密デザイン、機密情報**が含まれる可能性があります
+- 使用前に、以下への準拠を確認してください:
+  - データプライバシーポリシー
+  - セキュリティガイドライン
+  - 利用規約
+  - 顧客とのNDA
+
+**Recommended for Enterprise:**
+- Use **on-premises** LLM solutions (see Alternative Solutions below)
+- Use this feature only in **isolated test environments**
+- Get **explicit approval** from security/legal teams
+
+---
+
 ## Overview
 
 The Vision LLM integration enables **human-level visual analysis** of differences between Figma designs and Storybook implementations. Instead of just counting different pixels, it can identify:
@@ -368,3 +395,110 @@ This feature uses:
 - **OpenAI GPT-4V API** (https://openai.com)
 
 Please review their respective Terms of Service and Pricing.
+
+---
+
+## Alternative Solutions for Enterprise
+
+### Option 1: On-Premises LLM (Recommended for Enterprise)
+
+**Self-hosted Vision Models**:
+- **LLaVA** (Open Source): https://llava-vl.github.io/
+- **Qwen-VL** (Alibaba): https://github.com/QwenLM/Qwen-VL
+- **CogVLM** (THU): https://github.com/THUDM/CogVLM
+
+**Deployment**:
+```bash
+# Example: Run LLaVA locally with Docker
+docker run -p 8000:8000 llava-v1.6-34b
+```
+
+**Benefits**:
+- ✅ Complete data privacy
+- ✅ No external API calls
+- ✅ Compliance with corporate policies
+- ❌ Requires GPU infrastructure
+- ❌ Lower accuracy than Claude/GPT-4V
+
+### Option 2: Azure OpenAI (Enterprise-Grade)
+
+**For organizations already using Microsoft Azure**:
+- **Azure OpenAI Service** with GPT-4V
+- **Data residency** in your region
+- **Enterprise SLA** and support
+- **Compliance**: SOC 2, ISO 27001, HIPAA
+
+**Setup**:
+```bash
+export AZURE_OPENAI_ENDPOINT="https://your-resource.openai.azure.com/"
+export AZURE_OPENAI_API_KEY="your-key"
+```
+
+### Option 3: Manual Review (No AI)
+
+**Traditional approach**:
+1. Generate screenshots
+2. Manual side-by-side comparison
+3. Document differences in spreadsheet
+4. Apply CSS fixes manually
+
+**Benefits**:
+- ✅ Complete control
+- ✅ No external dependencies
+- ✅ Suitable for highly sensitive projects
+- ❌ Time-consuming
+- ❌ Prone to human error
+
+---
+
+## Data Privacy Considerations
+
+### What Data is Sent to External APIs?
+
+**Sent**:
+- 3 PNG screenshots (Figma, Storybook, Diff)
+- Text prompt (instructions for analysis)
+
+**NOT Sent**:
+- Source code
+- Environment variables
+- File system structure
+- Git history
+- Personal information (unless visible in screenshots)
+
+### API Provider Data Policies
+
+**Anthropic**:
+- Data retention: 30 days (then deleted)
+- Training: Does NOT use API data for model training
+- Compliance: SOC 2 Type 2, GDPR
+
+**OpenAI**:
+- Data retention: 30 days (then deleted)
+- Training: Does NOT use API data for model training (as of March 2023)
+- Compliance: SOC 2, ISO 27001, GDPR
+
+**Always verify** current policies at:
+- https://www.anthropic.com/legal/privacy
+- https://openai.com/policies/api-data-usage-policies
+
+---
+
+## Usage Guidelines for Enterprise
+
+### ✅ Safe to Use
+- **Public demo projects** (no confidential data)
+- **Internal proof-of-concept** (with approval)
+- **Personal learning projects**
+- **Open-source contributions**
+
+### ⚠️ Requires Approval
+- **Client projects** (check NDA terms)
+- **Proprietary designs** (check IP policy)
+- **Production systems** (check security policy)
+
+### ❌ Do Not Use
+- **Projects under strict NDA**
+- **Regulated industries** (healthcare, finance) without compliance review
+- **Government/defense projects**
+- **Highly confidential designs**

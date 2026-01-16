@@ -29,6 +29,8 @@
 
 ## 🚀 クイックスタート
 
+⚠️ **セキュリティ注意**: このテンプレートには外部AIサービス（Anthropic/OpenAI）との統合機能が含まれます。ビジネス利用の場合は、使用前にセキュリティポリシーへの準拠を確認してください。詳細: [Vision LLM Integration Guide](./docs/VISION-LLM-INTEGRATION.md)
+
 ### 5分でブロック生成
 
 ```bash

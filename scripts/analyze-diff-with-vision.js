@@ -3,6 +3,17 @@
 /**
  * Vision LLM Diff Analyzer
  * 
+ * ⚠️ SECURITY WARNING ⚠️
+ * This script sends screenshots to EXTERNAL AI services (Anthropic/OpenAI).
+ * Screenshots may contain proprietary/confidential information.
+ * 
+ * Before using:
+ * - Verify compliance with your organization's security policy
+ * - Ensure no NDA violations
+ * - Get approval from security/legal teams if required
+ * 
+ * For enterprise alternatives, see: docs/VISION-LLM-INTEGRATION.md
+ * 
  * Analyzes visual differences between Figma design and Storybook implementation
  * using Vision-capable LLM (Claude Sonnet 4 or GPT-4V)
  * 
