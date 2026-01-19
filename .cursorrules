@@ -1,12 +1,312 @@
-# EDS Block Generation Rules - Complete Automated Workflow
+# EDS Block Generation Rules - Enhanced Edition
+
+## 📋 Overview
+
+This guideline provides a comprehensive framework for generating high-precision EDS blocks from Figma designs.
+
+**Approach**:
+1. **Detailed Information Extraction from Figma** (Primary)
+2. **Automated Validation & Correction Loop** (Supporting)
+3. **Inheritance of Proven Patterns** (Foundation)
+
+---
 
 ## 🎯 Core Principles
 
-1. **Figma Fidelity**: 100% accurate reproduction of Figma designs
-2. **1:1 Variant Mapping**: Every Figma Variant = One Storybook Story
-3. **Design Token Usage**: All styles use CSS Custom Properties (no hardcoded values)
-4. **Automation**: Minimize manual intervention
-5. **Reproducibility**: Same input → Same output
+### 1. Figma Fidelity First
+- Prioritize information defined in Figma
+- Always reference Design Tokens (Variables)
+- Accurately reflect Component Set Variant structure
+- Minimize inference and speculation
+
+### 2. 1:1 Variant Mapping
+- Figma Variant → Storybook Story (1:1 generation)
+- Export independent Story for each Variant
+- Automatic testing of all variations via Visual Regression Testing
+
+### 3. Iterative Refinement
+- Execute automated validation loop after initial generation
+- Re-fetch accurate style information from Figma API
+- Detect differences → Fix CSS → Re-validate (max 5 iterations)
+
+### 4. Design Token Usage
+- All styles use CSS Custom Properties (no hardcoded values)
+- **Priority**: boundVariables > existing tokens > literal values
+
+### 5. Automation & Reproducibility
+- Minimize manual intervention
+- Same input → Same output
+
+---
+
+## 🔍 Understanding Figma API: Available Information and Limitations
+
+### Critical Premise
+
+**Figma API provides "design data", NOT "HTML code".**
+
+Figma → HTML/CSS conversion is a process of "interpreting" and "generating" data. Complete automatic conversion is impossible; certain inference and supplementation logic is required.
+
+---
+
+### ✅ Information Available from Figma API
+
+#### 1. Node Structure (Hierarchy)
+
+**Available**:
+```json
+{
+  "type": "COMPONENT_SET",
+  "name": "Carousel",
+  "id": "9392:122",
+  "children": [
+    {
+      "type": "COMPONENT",
+      "name": "isSingle=false, contentPosition=center",
+      "id": "9392:121",
+      "children": [
+        { "type": "RECTANGLE", "name": "Background" },
+        { "type": "TEXT", "name": "Title" },
+        { "type": "FRAME", "name": "Image Container" }
+      ]
+    }
+  ]
+}
+```
+
+**Usage**:
+- ✅ Parent-child relationships (base for DOM structure)
+- ✅ Infer semantic meaning from node names
+- ✅ Infer element types from node types
+
+**Limitations**:
+- ❌ **HTML element names (div, h1, button) NOT included**
+- ❌ **CSS class names NOT included**
+- 🔄 **Inference required**: Deduce elements from node name and type
+
+**Inference Logic Example**:
+```javascript
+function inferHTMLElement(node) {
+  const nameLower = node.name.toLowerCase();
+  
+  // Infer from node name
+  if (nameLower.includes('title') || nameLower.includes('heading')) {
+    return node.type === 'TEXT' ? 'h2' : 'div';
+  }
+  if (nameLower.includes('button') || nameLower.includes('btn')) {
+    return 'button';
+  }
+  if (nameLower.includes('link')) {
+    return 'a';
+  }
+  
+  // Infer from node type
+  if (node.type === 'TEXT') {
+    if (node.style?.fontSize >= 32) return 'h1';
+    if (node.style?.fontSize >= 24) return 'h2';
+    return 'p';
+  }
+  
+  return 'div'; // Default
+}
+```
+
+---
+
+#### 2. Layout Information (Auto Layout)
+
+**Available**:
+```json
+{
+  "layoutMode": "HORIZONTAL",
+  "primaryAxisAlignItems": "CENTER",
+  "counterAxisAlignItems": "MIN",
+  "itemSpacing": 16,
+  "paddingTop": 32,
+  "paddingRight": 24,
+  "paddingBottom": 32,
+  "paddingLeft": 24
+}
+```
+
+**CSS Conversion Mapping** (Mechanical):
+```javascript
+{
+  layoutMode: {
+    "HORIZONTAL": { display: "flex", "flex-direction": "row" },
+    "VERTICAL": { display: "flex", "flex-direction": "column" },
+    "NONE": { display: "block" }
+  },
+  primaryAxisAlignItems: {
+    "MIN": "justify-content: flex-start",
+    "CENTER": "justify-content: center",
+    "MAX": "justify-content: flex-end",
+    "SPACE_BETWEEN": "justify-content: space-between"
+  },
+  counterAxisAlignItems: {
+    "MIN": "align-items: flex-start",
+    "CENTER": "align-items: center",
+    "MAX": "align-items: flex-end"
+  }
+}
+```
+
+---
+
+#### 3. Visual Properties
+
+**Available**:
+```json
+{
+  "fills": [{ "color": { "r": 0.102, "g": 0.286, "b": 0.537, "a": 1 } }],
+  "strokes": [{ "strokeWeight": 2, "color": { "r": 0, "g": 0, "b": 0, "a": 1 } }],
+  "cornerRadius": 8,
+  "effects": [{
+    "type": "DROP_SHADOW",
+    "radius": 4,
+    "offset": { "x": 0, "y": 2 },
+    "color": { "r": 0, "g": 0, "b": 0, "a": 0.25 }
+  }]
+}
+```
+
+**Limitation**:
+- ⚠️ **Computed values only** (becomes literal values)
+- 🔄 **Design token conversion required** (via boundVariables)
+
+---
+
+#### 4. Design Tokens (Variables) 🌟 **MOST IMPORTANT**
+
+**Available**:
+```json
+{
+  "boundVariables": {
+    "fills": [{ "type": "VARIABLE_ALIAS", "id": "VariableID:123" }],
+    "paddingTop": { "type": "VARIABLE_ALIAS", "id": "VariableID:456" }
+  }
+}
+
+// Fetch Variable details separately
+{
+  "VariableID:123": {
+    "name": "color/primary/500",  // Variable name!
+    "resolvedType": "COLOR",
+    "valuesByMode": { "mode1": { "r": 0.102, "g": 0.286, "b": 0.537, "a": 1 } }
+  }
+}
+```
+
+**CSS Generation Priority**:
+```javascript
+async function generateCSSProperty(node, property) {
+  // Priority 1: boundVariables exists
+  if (node.boundVariables?.[property]) {
+    const varId = node.boundVariables[property].id;
+    const variable = await fetchVariable(varId);
+    const cssVarName = variable.name.replace(/\//g, '-');
+    return `var(--${cssVarName})`;  // ✅ BEST
+  }
+  
+  // Priority 2: Search existing tokens in styles.css
+  const value = node[property];
+  const existingToken = findTokenByValue(value, 'styles/styles.css');
+  if (existingToken) {
+    return `var(${existingToken})`;  // ✅ NEXT BEST
+  }
+  
+  // Priority 3: Literal value + TODO
+  return `${value}px /* TODO: Create design token */`;  // ⚠️ LAST RESORT
+}
+```
+
+---
+
+### ❌ Information NOT Available from Figma API
+
+#### 1. HTML Code Structure
+```html
+<!-- Cannot be generated (requires inference) -->
+<div class="carousel">
+  <h2 class="carousel-title">Title</h2>
+  <button class="carousel-button">Next</button>
+</div>
+```
+
+**Workaround**: 
+- Infer elements from node name/type
+- Generate structure following EDS conventions
+- Generate class names using BEM naming
+
+---
+
+#### 2. Semantic Element Names
+
+**Cannot determine**:
+- `<h1>` vs `<h2>` vs `<h3>`?
+- `<button>` vs `<a>` vs clickable `<div>`?
+- `<nav>` vs `<div>`?
+
+**Workaround**:
+```javascript
+// Infer heading level from font size
+if (node.style.fontSize >= 48) return 'h1';
+if (node.style.fontSize >= 32) return 'h2';
+
+// Infer from node name
+if (node.name.toLowerCase().includes('button')) return 'button';
+if (node.name.toLowerCase().includes('link')) return 'a';
+```
+
+---
+
+#### 3. CSS Class Names
+
+**Cannot generate**:
+```css
+.carousel { }
+.carousel-title { }
+.carousel-button--primary { }
+```
+
+**Workaround**: Generate using BEM convention
+```javascript
+const blockName = toKebabCase(componentSetName);  // "Carousel" → "carousel"
+const elementName = toKebabCase(nodeName);        // "Title" → "title"
+const className = `${blockName}-${elementName}`;  // "carousel-title"
+```
+
+---
+
+#### 4. Interactions & States
+
+**Cannot obtain**:
+- Hover state styles
+- Focus state styles
+- Click behaviors
+- Animations
+
+**Workaround**:
+- Hover/Focus/Active → **Must be defined as separate Variants**
+- JavaScript behaviors → **Manual implementation required**
+- Animations → **CSS/JS implementation required**
+
+---
+
+#### 5. Accessibility Attributes
+
+**Cannot generate**:
+```html
+<button aria-label="Next slide" aria-pressed="false" role="button">
+```
+
+**Workaround**: Add using rule-based logic
+```javascript
+if (element === 'button') {
+  button.setAttribute('aria-label', inferLabel(node));
+  button.setAttribute('role', 'button');
+}
+```
 
 ---
 
@@ -15,8 +315,8 @@
 ### Phase 1: Figma Analysis & Style Extraction
 
 #### Step 1.1: Identify Component Structure
+
 ```bash
-# When user provides: @figma <url> or --node-id=<id>
 npm run inspect-figma -- --node-id=<component-set-node-id>
 ```
 
@@ -26,7 +326,9 @@ npm run inspect-figma -- --node-id=<component-set-node-id>
 - Variant names and properties
 - Component dimensions (width × height)
 
-**Update**: `config/figma/figma-urls.json` with Variant mapping
+**Save to**: `config/figma/figma-urls.json`
+
+---
 
 #### Step 1.2: Extract Detailed Styles from Each Variant
 
@@ -51,17 +353,17 @@ GET /v1/files/{fileId}/nodes?ids={nodeId}
   layoutMode: "HORIZONTAL" | "VERTICAL" | "NONE",
   primaryAxisAlignItems: "MIN" | "CENTER" | "MAX" | "SPACE_BETWEEN",
   counterAxisAlignItems: "MIN" | "CENTER" | "MAX",
-  itemSpacing: number,                           // Check boundVariables first!
-  paddingTop: number,                            // Check boundVariables first!
-  paddingRight: number,                          // Check boundVariables first!
-  paddingBottom: number,                         // Check boundVariables first!
-  paddingLeft: number,                           // Check boundVariables first!
+  itemSpacing: number,
+  paddingTop: number,
+  paddingRight: number,
+  paddingBottom: number,
+  paddingLeft: number,
   
   // Visual Properties
-  fills: [{ type, color: { r, g, b, a }, opacity }],  // Check boundVariables first!
-  strokes: [{ type, color: { r, g, b, a }, strokeWeight }],  // Check boundVariables first!
-  cornerRadius: number | { topLeft, topRight, bottomLeft, bottomRight },  // Check boundVariables first!
-  opacity: number,                               // Check boundVariables first!
+  fills: [{ type, color: { r, g, b, a }, opacity }],
+  strokes: [{ type, color, strokeWeight }],
+  cornerRadius: number,
+  opacity: number,
   
   // Effects
   effects: [
@@ -70,23 +372,24 @@ GET /v1/files/{fileId}/nodes?ids={nodeId}
   
   // Typography (for TEXT nodes)
   style: {
-    fontFamily: string,                          // Check boundVariables first!
-    fontSize: number,                            // Check boundVariables first!
-    fontWeight: number,                          // Check boundVariables first!
-    lineHeightPx: number,                        // Check boundVariables first!
-    letterSpacing: number,                       // Check boundVariables first!
-    textAlignHorizontal: "LEFT" | "CENTER" | "RIGHT",
-    textAlignVertical: "TOP" | "CENTER" | "BOTTOM"
+    fontFamily: string,
+    fontSize: number,
+    fontWeight: number,
+    lineHeightPx: number,
+    letterSpacing: number,
+    textAlignHorizontal: "LEFT" | "CENTER" | "RIGHT"
   }
 }
 ```
 
 **Extraction Priority**:
-1. **If `boundVariables` exists for a property**: Use variable reference (e.g., `var(--spacing-xl)`)
-2. **If no `boundVariables`**: Search for matching token in `styles.css` by value
+1. **If `boundVariables` exists**: Use variable reference (e.g., `var(--spacing-xl)`)
+2. **If no `boundVariables`**: Search for matching token in `styles.css`
 3. **If no match**: Use literal value + add TODO comment
 
 **Save to**: `blocks/{block}/figma-styles.json`
+
+---
 
 #### Step 1.3: Map Figma Values to Design Tokens
 
@@ -110,6 +413,8 @@ GET /v1/files/{fileId}/nodes?ids={nodeId}
 
 **Save to**: `blocks/{block}/token-mapping.json`
 
+---
+
 #### Step 1.4: Download All Assets
 
 ```bash
@@ -125,6 +430,34 @@ npm run download-all-variants -- --block=<block-name>
 
 ### Phase 2: Code Generation
 
+⚠️ **CRITICAL RULES for Code Generation**
+
+1. **Storybook Files MUST Include**:
+   - `import '../../styles/styles.css';` ✅
+   - `import './{block}.css';` ✅
+   - `import decorate from './{block}.js';` ✅
+   - **NEVER** import `createBlock` from scripts.js ❌
+
+2. **EDS Structure Compliance**:
+   - Storybook HTML MUST match EDS doc-based authoring structure
+   - Pattern: Block > Rows > Cells > Content
+   - Verify with `aem up` → `localhost:3000` before `decorate()` runs
+   - Reference: `blocks/hero/hero.stories.js` for correct pattern
+
+3. **Verify After Generation**:
+   - Check browser console for import errors
+   - Test Storybook preview renders correctly
+   - Confirm all CSS is loaded
+   - Inspect initial HTML structure matches EDS
+
+4. **If Storybook Fails**:
+   - First check: Are CSS imports present?
+   - Second check: Any non-existent imports?
+   - Third check: Does HTML structure match EDS (Row > Cell)?
+   - Fourth check: Restart Storybook after fixes
+
+---
+
 #### Step 2.1: Generate CSS
 
 **Template Structure**:
@@ -137,112 +470,222 @@ npm run download-all-variants -- --block=<block-name>
 /* Root Block - from Figma Component Set root */
 .{block} {
   /* Layout - from Figma Auto Layout */
-  display: {layoutMode === "HORIZONTAL" ? "flex" : "block"};
-  flex-direction: {layoutMode === "HORIZONTAL" ? "row" : "column"};
-  justify-content: {mapAlignment(primaryAxisAlignItems)};
-  align-items: {mapAlignment(counterAxisAlignItems)};
-  gap: var({mapToken(itemSpacing)});
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-m);
   
   /* Spacing - mapped to design tokens */
-  padding: var({mapToken(paddingTop)}) var({mapToken(paddingRight)}) 
-           var({mapToken(paddingBottom)}) var({mapToken(paddingLeft)});
+  padding: var(--spacing-xl) var(--spacing-l);
   margin: 0 auto;
   
-  /* Sizing - from absoluteBoundingBox */
-  max-width: var(--container-max-width, {width}px);
+  /* Sizing */
+  max-width: var(--container-max-width, 1200px);
   width: 100%;
   
-  /* Visual - from fills/strokes */
-  background-color: {mapColor(fills[0])};
-  border: {strokes[0] ? mapStroke(strokes[0]) : "none"};
-  border-radius: var({mapToken(cornerRadius)});
-  opacity: {opacity};
+  /* Visual - from boundVariables */
+  background-color: var(--color-surface-primary);
+  border: var(--border-m) solid var(--color-border-primary);
+  border-radius: var(--radius-m);
   
-  /* Effects - from effects array */
-  box-shadow: {mapShadow(effects)};
-  
-  /* Position */
-  position: relative;
+  /* Effects */
+  box-shadow: var(--shadow-m);
 }
 
 /* Child Elements - from Figma node hierarchy */
-{for each child node:}
-.{block} .{block}-{childNodeName} {
-  {recursively apply same logic}
+.{block}-title {
+  font-family: var(--font-family-primary);
+  font-size: var(--h2-font-size);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
 }
 ```
 
-**Automation Function**:
-```javascript
-function generateCSSFromFigmaNode(node, selector, tokenMappings) {
-  const properties = [];
-  
-  // Layout
-  if (node.layoutMode) {
-    properties.push(...convertAutoLayoutToCSS(node));
-  }
-  
-  // Spacing
-  if (node.paddingTop || node.paddingLeft) {
-    const token = findTokenForValue(node.paddingTop, tokenMappings);
-    properties.push(`padding: var(${token}, ${node.paddingTop}px);`);
-  }
-  
-  // Visual
-  if (node.fills) {
-    const color = convertColor(node.fills[0]);
-    const token = findTokenForColor(color, tokenMappings);
-    properties.push(`background-color: var(${token}, ${color});`);
-  }
-  
-  // ... etc for all properties
-  
-  return { selector, properties };
-}
-```
+**Token Usage Enforcement**:
+- ❌ **Prohibited**: Hardcoded values (`#1a4989`, `40px`, `8px`)
+- ✅ **Required**: CSS Custom Properties (`var(--color-primary-500)`)
+- ⚠️ **Exception**: Literal value + TODO comment only if token doesn't exist
+
+---
 
 #### Step 2.2: Generate JavaScript
 
 **Follow EDS Block Collection patterns**:
 
+**CRITICAL: Understanding EDS Initial Structure**
+
+⚠️ The `block` parameter passed to `decorate()` already contains the EDS-generated structure:
+
+```javascript
+// Input structure (from EDS document):
+// | Carousel |
+// | image1.png | Title 1 | Text 1 |
+// | image2.png | Title 2 | Text 2 |
+
+// Results in this HTML structure BEFORE decorate() runs:
+<div class="carousel">
+  <div>                          <!-- Row 1 -->
+    <div><img src="image1.png"/></div>  <!-- Cell 1 -->
+    <div>Title 1</div>                   <!-- Cell 2 -->
+    <div>Text 1</div>                    <!-- Cell 3 -->
+  </div>
+  <div>                          <!-- Row 2 -->
+    <div><img src="image2.png"/></div>  <!-- Cell 1 -->
+    <div>Title 2</div>                   <!-- Cell 2 -->
+    <div>Text 2</div>                    <!-- Cell 3 -->
+  </div>
+</div>
+```
+
+**JavaScript Template**:
+
 ```javascript
 /**
  * {Block} Block
  * Generated from Figma Component: {nodeId}
- * 
  * Variants: {list variant names}
  */
 
 export default function decorate(block) {
-  // 1. Extract EDS-generated structure
+  // 1. Extract EDS-generated structure (Row > Cell pattern)
   const rows = [...block.children];
   
-  // 2. Create semantic HTML structure
-  // Based on Figma hierarchy
+  // Example: Skip metadata row if present
+  let contentRows = rows;
+  if (rows[0]?.children.length === 2 && 
+      rows[0].children[0].textContent.trim().toLowerCase() === '{block}') {
+    contentRows = rows.slice(1);
+  }
+  
+  // 2. Create semantic HTML structure based on Figma hierarchy
   const container = document.createElement('div');
   container.className = `${block.className.split(' ')[0]}-container`;
   
+  // 3. Process content model
   rows.forEach((row, index) => {
-    const cols = [...row.children];
     // Process based on Figma variant structure
-    processRow(cols, container, index);
   });
   
-  // 3. Add interactivity (if needed)
+  // 4. Add interactivity (if needed)
   if (hasInteractiveElements(container)) {
     setupEventHandlers(container);
   }
   
-  // 4. Add accessibility attributes
+  // 5. Accessibility enhancements
   enhanceAccessibility(container);
   
-  // 5. Replace block content
+  // 6. Replace block content
   block.textContent = '';
   block.append(container);
 }
 ```
 
+**Reference**: Follow patterns in existing EDS blocks and `ak-eds/BLOCK-GENERATION-GUIDE.md`
+
+---
+
 #### Step 2.3: Generate Storybook Stories
+
+**CRITICAL: Required Imports**
+
+⚠️ **ALWAYS include these imports at the top of every `.stories.js` file:**
+
+```javascript
+import '../../styles/styles.css';  // ✅ REQUIRED - Global styles
+import './{block}.css';            // ✅ REQUIRED - Block-specific styles
+import decorate from './{block}.js'; // ✅ REQUIRED - Block logic
+```
+
+**Common Mistakes to AVOID:**
+- ❌ `import { createBlock } from '../../scripts/scripts.js';` - **NEVER import createBlock** (not exported)
+- ❌ Missing CSS imports - Stories will fail to render
+- ❌ Importing from wrong paths
+
+---
+
+**CRITICAL: EDS Doc-based Authoring Structure**
+
+⚠️ **Storybook HTML MUST match the initial EDS markup structure:**
+
+**EDS Markdown Table → Initial HTML Structure**:
+
+In EDS, blocks are authored as tables in documents (Word/Google Docs/Markdown):
+
+```markdown
+| Hero |
+|------|
+| Heading in Block |
+```
+
+This is converted to the following **initial HTML structure** before `decorate()` is called:
+
+```html
+<div class="hero">
+  <div>              <!-- Row 1 -->
+    <div>            <!-- Cell 1 -->
+      <h1>Heading in Block</h1>
+    </div>
+  </div>
+</div>
+```
+
+**Structure Rules**:
+1. **Block** = `<div class="{block-name}">`
+2. **Rows** = Direct children `<div>` (one per table row)
+3. **Cells** = Children of row `<div>` (one per table column)
+4. **Content** = Inside cells (headings, paragraphs, images, links)
+
+**Critical for Storybook**:
+```javascript
+// ✅ CORRECT - Matches EDS structure
+const createBlockHTML = (args) => {
+  const block = document.createElement('div');
+  block.className = 'carousel';
+  
+  // Row for each slide (matching table structure)
+  args.slides.forEach(slide => {
+    const row = document.createElement('div');  // ← Row
+    
+    const imageCell = document.createElement('div');  // ← Cell 1
+    imageCell.innerHTML = '<picture>...</picture>';
+    row.appendChild(imageCell);
+    
+    const textCell = document.createElement('div');  // ← Cell 2
+    textCell.innerHTML = '<h3>Title</h3><p>Text</p>';
+    row.appendChild(textCell);
+    
+    block.appendChild(row);
+  });
+  
+  return block;
+};
+
+// ❌ WRONG - Does not match EDS structure
+const createBlockHTML = (args) => {
+  const block = document.createElement('div');
+  block.innerHTML = `
+    <div class="carousel-slide">  <!-- ❌ Not EDS structure -->
+      <img src="..." />
+      <h3>Title</h3>
+    </div>
+  `;
+  return block;
+};
+```
+
+**Verification Method**:
+1. **Local EDS Environment**: Start `aem up` → `http://localhost:3000`
+2. **Create test document** with your block table structure
+3. **Inspect HTML** before `decorate()` runs (check `data-block-status="initialized"`)
+4. **Match Storybook structure** to this initial HTML
+
+**Reference**:
+- See `blocks/hero/hero.stories.js` for correct pattern
+- See EDS docs: https://www.aem.live/developer/markup-sections-blocks
+- Pattern: `Block > Rows > Cells > Content`
+
+---
 
 **1:1 Figma Variant → Story mapping**:
 
@@ -250,7 +693,6 @@ export default function decorate(block) {
 /**
  * {Block} Block Stories
  * Auto-generated from Figma Variants
- * 
  * Figma Component Set: {componentSetNodeId}
  */
 
@@ -259,8 +701,8 @@ import './{block}.css';
 import decorate from './{block}.js';
 
 // Import assets (auto-generated from download-all-variants)
-{for each variant with images:}
-import {variantName}Image from './assets/{variantName}-image.png';
+import variant1Image from './assets/variant1-image.png';
+import variant2Image from './assets/variant2-image.png';
 
 export default {
   title: 'Blocks/{Block}',
@@ -274,41 +716,60 @@ export default {
   },
 };
 
-// Helper to create block HTML
-const createBlockHTML = (config) => {
-  const block = document.createElement('div');
-  block.className = '{block} block';
-  block.setAttribute('data-block-name', '{block}');
+// Template function
+const Template = (args) => {
+  const main = document.createElement('main');
+  const section = document.createElement('div');
+  section.className = 'section {block}-container';
   
-  // Build structure based on config
-  // ...
+  const wrapper = document.createElement('div');
+  wrapper.className = '{block}-wrapper';
+  
+  const block = createBlock(args);
+  wrapper.appendChild(block);
+  section.appendChild(wrapper);
+  main.appendChild(section);
   
   decorate(block);
-  return block;
+  return main;
 };
 
-// Generate Stories from Figma Variants
-{for each variant in config/figma/figma-urls.json:}
-/**
- * Variant: {variantName}
- * Figma Node: {variantNodeId}
- * Properties: {variantProperties}
- */
-export const {variantName} = {
-  render: () => {
-    return createBlockHTML({
-      images: [{variantName}Image],
-      // ... other config from Figma
-    });
-  },
+// Generate Stories from Figma Variants (1:1 mapping)
+export const Variant1Name = {
+  render: () => Template({ image: variant1Image }),
   parameters: {
     design: {
       type: 'figma',
-      url: 'https://www.figma.com/file/{fileId}?node-id={variantNodeId}',
-    },
-  },
+      url: 'https://www.figma.com/file/{fileId}?node-id={variant1NodeId}'
+    }
+  }
+};
+
+export const Variant2Name = {
+  render: () => Template({ image: variant2Image }),
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/file/{fileId}?node-id={variant2NodeId}'
+    }
+  }
 };
 ```
+
+**Story Export Strategy**:
+
+✅ **Must export**:
+- Layout variants (default, compact, full-width)
+- Style variants (primary, secondary, highlighted)
+- Size variants (small, medium, large)
+- Color/theme variants (light, dark, on-dark-background)
+- Content variants (minimal, long-content, empty-state)
+- Important edge cases (no-image, many-items)
+
+❌ **Do not export**:
+- Pure interaction behaviors (unless visual change)
+- Non-visual functionality
+- Dynamic data loading (unless affects render)
 
 ---
 
@@ -318,12 +779,10 @@ export const {variantName} = {
 
 ```bash
 # For each variant in config
-for variantNodeId in $(get-variant-node-ids {block}); do
-  npm run validate-block -- \
-    --block={block} \
-    --node-id=$variantNodeId \
-    --demo
-done
+npm run validate-block -- \
+  --block={block} \
+  --node-id={variantNodeId} \
+  --demo
 ```
 
 **Validation Process**:
@@ -332,16 +791,35 @@ done
 3. Set Storybook viewport to match Figma size
 4. Capture Storybook screenshot (deviceScaleFactor=2)
 5. Compare pixel-by-pixel (pixelmatch)
-6. If diff > threshold (0.1%):
+6. If diff > threshold (5%):
    - Re-fetch Figma styles
    - Apply CSS fixes
-   - Wait for hot reload
+   - Wait for hot reload (3s)
    - Repeat (max 5 iterations)
+
+**Demo Output Example**:
+```
+📍 Iteration 1/5
+📥 Fetching Figma styles for node 9392:121...
+📸 Capturing Storybook (viewport: 1160x639)...
+🔍 Comparing images...
+⚠️  Found 3 style difference(s):
+   ❌ backgroundColor:
+      Figma:     "rgb(26, 73, 137)"  (--color-primary-500)
+      Storybook: "rgb(255, 255, 255)"
+🔧 Applying fixes to {block}.css...
+✅ Fixes applied
+⏳ Waiting for hot reload (3s)...
+
+📍 Iteration 2/5
+✅ All styles match! Visual difference: 2.1%
+```
+
+---
 
 #### Step 3.2: CSS Auto-Fix Logic
 
-**Current**: Heuristic-based fixes
-**Next**: Figma API-driven fixes
+**Intelligent Fixes using Figma API**:
 
 ```javascript
 async function applyIntelligentFixes(blockName, figmaNodeId, diffPercentage) {
@@ -381,6 +859,7 @@ async function applyIntelligentFixes(blockName, figmaNodeId, diffPercentage) {
 
 #### Step 4.1: Auto-Generate Documentation
 
+**Template**:
 ```markdown
 # {Block} Block
 
@@ -391,7 +870,6 @@ async function applyIntelligentFixes(blockName, figmaNodeId, diffPercentage) {
 
 ## Variants ({variantCount})
 
-{for each variant:}
 ### {VariantName}
 - **Node ID**: {variantNodeId}
 - **Dimensions**: {width} × {height}
@@ -421,6 +899,8 @@ async function applyIntelligentFixes(blockName, figmaNodeId, diffPercentage) {
 - **Last Baseline**: {lastBaseline}
 - **Storybook Build**: [View]({chromaticUrl})
 ```
+
+---
 
 #### Step 4.2: Update Config
 
@@ -452,21 +932,35 @@ async function applyIntelligentFixes(blockName, figmaNodeId, diffPercentage) {
 
 ### Full End-to-End Generation
 ```bash
-npm run generate-block -- --figma-node=<component-set-id> --block=<name>
+# User provides:
+@figma https://www.figma.com/design/FILE_ID?node-id=NODE_ID
+Generate EDS Block for "{BlockName}"
+
+# AI automatically executes:
+# 0. Verify EDS structure (aem up → localhost:3000 → inspect initial HTML)
+# 1. inspect-figma
+# 2. extract-styles (with boundVariables priority)
+# 3. map-tokens
+# 4. download-all-variants
+# 5. generate-css
+# 6. generate-js (matching EDS Row > Cell structure)
+# 7. generate-stories (matching EDS initial HTML)
+# 8. validate-all-variants (auto-fix loop)
+# 9. generate-docs
 ```
 
-**Executes**:
-1. `inspect-figma`
-2. `extract-styles`
-3. `map-tokens`
-4. `download-all-variants`
-5. `generate-css`
-6. `generate-js`
-7. `generate-stories`
-8. `validate-all-variants`
-9. `generate-docs`
+**Critical Step 0: Verify EDS Structure**
+Before generating Storybook code:
+1. Create test document in EDS with block table
+2. Start `aem up` → `http://localhost:3000`
+3. Inspect HTML with `data-block-status="initialized"`
+4. Document the Row > Cell structure
+5. Use this structure for Storybook `createBlock()` function
+
+---
 
 ### Individual Commands (for debugging/iteration)
+
 ```bash
 # Analysis
 npm run inspect-figma -- --node-id=<id>
@@ -483,11 +977,21 @@ npm run generate-js -- --block=<name>
 npm run generate-stories -- --block=<name>
 
 # Validation
-npm run validate-block -- --block=<name> --node-id=<id>
+npm run validate-block -- --block=<name> --node-id=<id> --demo
 npm run validate-all-variants -- --block=<name>
+
+# Visual Regression (local)
+npm run visual-test -- --block=<name> --update-baseline
 
 # Documentation (to be implemented)
 npm run generate-docs -- --block=<name>
+
+# Storybook
+npm run storybook
+
+# Chromatic (2-layer)
+npm run chromatic:storybook  # Layer 1
+npm run chromatic:playwright # Layer 2
 ```
 
 ---
@@ -496,6 +1000,10 @@ npm run generate-docs -- --block=<name>
 
 ### Per Block
 - [ ] All Figma Variants have corresponding Stories (1:1 mapping)
+- [ ] **Stories file has correct imports** (styles.css, {block}.css, decorate function)
+- [ ] **Storybook HTML matches EDS structure** (Block > Row > Cell pattern)
+- [ ] **Verified with local EDS** (`aem up` → inspect initial HTML)
+- [ ] **No import errors in Storybook** (verify in browser console)
 - [ ] Visual diff < 5% for all Variants
 - [ ] 90%+ of styles use design tokens (not hardcoded)
 - [ ] HTML structure matches EDS specification
@@ -512,6 +1020,13 @@ npm run generate-docs -- --block=<name>
 - [ ] Typography properties match (font, size, weight)
 - [ ] Interactive states work (hover, focus, active)
 - [ ] Responsive behavior correct
+
+### Code Quality
+- [ ] ESLint passes
+- [ ] Accessibility (WCAG AA compliance)
+- [ ] Keyboard navigation functional
+- [ ] Semantic HTML structure
+- [ ] Performance optimized
 
 ---
 
@@ -557,13 +1072,14 @@ When Figma design changes:
 - Automated Visual Validation (pixel-by-pixel)
 - Storybook Screenshot Capture
 - Variant → Story mapping
+- boundVariables extraction
 
 ### 🚧 In Progress
-- Figma Styles Extraction (detailed)
-- Design Token Mapping
-- CSS Auto-Generation
-- JS Auto-Generation
-- Stories Auto-Generation
+- Figma Styles Extraction (enhanced with boundVariables priority)
+- Design Token Mapping (automated)
+- CSS Auto-Generation (with complete mapping tables)
+- JS Auto-Generation (following EDS patterns)
+- Stories Auto-Generation (1:1 Variant mapping)
 
 ### 📋 Planned
 - Vision LLM Integration
@@ -574,9 +1090,227 @@ When Figma design changes:
 
 ---
 
-## 📖 Reference Documents
+## 🎓 Supplemental Guide
 
-- **Complete Workflow**: `docs/BLOCK-GENERATION-COMPLETE-WORKFLOW.md`
-- **Visual Validation**: `docs/FIGMA-STORYBOOK-AUTO-VALIDATION-COMPLETE.md`
-- **Chromatic Strategy**: `ROADMAP.md`
-- **Quick Start**: `QUICKSTART.md`
+### Usage Levels
+
+#### Level 1: Basic Usage (Recommended)
+```bash
+# Simply provide Figma URL, AI handles everything
+@figma https://www.figma.com/design/FILE_ID?node-id=NODE_ID
+Generate EDS Block for "BlockName"
+```
+
+**AI automatically executes**:
+1. Figma API extraction (boundVariables priority)
+2. Image asset download
+3. JS/CSS/Stories generation (following these rules)
+4. Automated validation loop (until visual diff < 5%)
+
+---
+
+#### Level 2: Customization
+```bash
+# With UserStory reference
+@figma <URL>
+@docs/user-stories/block-name.md
+Generate EDS Block with UserStory requirements
+
+# Refactor existing block
+@figma <URL>
+Refactor blocks/existing-block/ to match Figma design
+```
+
+---
+
+#### Level 3: Individual Commands (Debugging)
+```bash
+# Phase 1: Structure investigation
+npm run inspect-figma -- --node-id=<id>
+
+# Phase 2: Token extraction
+npm run extract-figma-tokens
+
+# Phase 3: Image retrieval
+npm run download-all-variants -- --block=<name>
+
+# Validation loop
+npm run validate-block -- --block=<name> --node-id=<id> --demo
+```
+
+---
+
+### AI Instruction Examples
+
+#### ✅ Good Examples
+
+**Example 1: Simple generation**
+```
+@figma https://www.figma.com/design/MJTwyRbE5EVdlci3UIwsut?node-id=9392-122
+Generate EDS Block for "Carousel"
+```
+
+**Example 2: Detailed instructions**
+```
+@figma https://www.figma.com/design/MJTwyRbE5EVdlci3UIwsut?node-id=9392-122
+
+Generate EDS Carousel block with these priorities:
+1. Use boundVariables for all design tokens
+2. Generate Story for each Figma Variant (1:1 mapping)
+3. Run automatic validation loop until visual diff < 5%
+4. Ensure WCAG AA accessibility compliance
+```
+
+---
+
+#### ❌ Bad Examples
+
+**Example 1: Vague instruction**
+```
+Create a carousel block that looks nice
+```
+→ No Figma URL, cannot extract design information
+
+**Example 2: Over-specification**
+```
+@figma <URL>
+Generate carousel block with:
+- background-color: #1a4989
+- padding: 40px
+- font-size: 48px
+```
+→ Can auto-extract from Figma, hardcoding not needed
+
+---
+
+### Troubleshooting
+
+#### Issue 1: Visual diff remains large (> 5%)
+**Cause**: boundVariables not used, or existing tokens insufficient
+
+**Solution**:
+1. Check `blocks/{block}/figma-token-mapping.json`
+2. Add missing tokens to `styles/styles.css`
+3. Re-run `validate-block`
+
+---
+
+#### Issue 2: HTML structure differs from expectation
+**Cause**: Inference logic from node name is inappropriate
+
+**Solution**:
+1. Clarify Figma node names ("Title" → "Main Heading")
+2. Manually adjust HTML elements if needed
+3. Confirm EDS standard pattern compliance
+
+---
+
+#### Issue 3: Storybook Preview Fails to Render
+
+**Symptoms**:
+- Stories appear in sidebar but preview is blank
+- Browser console shows import errors
+- Error: "does not provide an export named 'X'"
+
+**Common Causes & Solutions**:
+
+1. **Missing CSS Imports** ⚠️ Most Common
+   ```javascript
+   // ❌ WRONG - Missing imports
+   import decorate from './carousel.js';
+   
+   // ✅ CORRECT - All required imports
+   import '../../styles/styles.css';
+   import './carousel.css';
+   import decorate from './carousel.js';
+   ```
+
+2. **Invalid Imports**
+   ```javascript
+   // ❌ WRONG - createBlock doesn't exist
+   import { createBlock } from '../../scripts/scripts.js';
+   
+   // ✅ CORRECT - Only import decorate
+   import decorate from './carousel.js';
+   ```
+
+3. **Stale Cache**
+   ```bash
+   # Kill and restart Storybook
+   lsof -ti:6006 | xargs kill -9
+   npm run storybook
+   ```
+
+**Prevention**:
+- Always use the template in Step 2.3
+- Verify imports before testing
+- Check browser console immediately after generation
+
+---
+
+#### Issue 4: Too few Storybook Stories
+**Cause**: Figma Variants not properly detected
+
+**Solution**:
+1. `npm run inspect-figma -- --node-id=<id>` to verify structure
+2. Confirm Component Set Node ID is specified
+3. Record each Variant Node ID in `config/figma/figma-urls.json`
+
+---
+
+### Quality Improvement Tips
+
+#### Figma Design Preparation
+1. **Clearly define Component Set and Variants**
+   - Define visually different items as separate Variants
+   - Clear Variant names (e.g., `isSingle=true, contentPosition=center`)
+
+2. **Utilize Design Tokens (Variables)**
+   - Bind colors, spacing, typography to Variables
+   - Unified naming convention (e.g., `color/primary/500`, `spacing/xl`)
+
+3. **Clear Node Names**
+   - Role-indicating names ("Title", "Button Next", "Image Container")
+   - Names suggesting HTML elements ("Heading", "Button", "Link")
+
+---
+
+#### Post-Generation Review
+1. **Check boundVariables Usage Rate**
+   - Goal: 90%+
+   - If many literal values, consider Variable-izing in Figma
+
+2. **Storybook Story Coverage**
+   - All Figma Variants → Story Export (1:1)
+   - Add edge cases (Empty, LongContent, etc.)
+
+3. **Accessibility**
+   - Auto-check with Storybook A11y Addon
+   - Manual test keyboard navigation
+
+---
+
+## 📚 Reference Documents
+
+### Main Guidelines
+- `ak-eds/BLOCK-GENERATION-GUIDE.md` - EDS standard patterns
+- `ak-eds/AGENTS.md` - AEM EDS overview
+- `d2c/ROADMAP.md` - Project vision
+- `d2c/docs/FIGMA-STORYBOOK-AUTO-VALIDATION-COMPLETE.md` - Automated validation details
+
+### Technical References
+- [Figma API Documentation](https://www.figma.com/developers/api)
+- [Adobe EDS Documentation](https://www.aem.live/docs/)
+- [EDS Block Collection](https://github.com/adobe/aem-block-collection)
+
+---
+
+**Last Updated**: 2026-01-19  
+**Version**: 2.0 Enhanced  
+**Base**: `ak-eds` + `d2c` best practices integration
+
+**Key Improvements**:
+- Figma API limitations and workarounds clarified
+- Detailed inference & supplementation logic
+- boundVariables First strategy emphasized
+- Practical troubleshooting guide added

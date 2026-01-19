@@ -34,6 +34,24 @@ Grid of card items, each with image, title, description, and optional CTA.
   },
 };
 
+/**
+ * Creates EDS-style cards block DOM structure
+ * Matches EDS doc-based authoring output from localhost:3000/vrtest
+ * 
+ * EDS Structure:
+ * - Block: <div class="cards">
+ * - Rows: Each <div> child = one card (table row)
+ * - Cells: Each <div> inside row = content cell
+ * 
+ * Two patterns:
+ * 1. Image + Content: Row has 2 cells (image cell, content cell)
+ * 2. Content only: Row has 1 cell (content cell)
+ * 
+ * Content cell structure (matches EDS output):
+ * - Title: <p><strong>Text</strong></p>
+ * - Description: <p>Text</p>
+ * - Link: <p><a href="...">Text</a></p>
+ */
 const createCardsBlock = ({
   cardCount = 3, hasImage = true, hasLink = false, isHover = false,
 }) => {
@@ -41,29 +59,37 @@ const createCardsBlock = ({
   block.className = 'cards';
   if (isHover) block.classList.add('hover-state');
 
-  for (let i = 0; i < cardCount; i++) {
-    const card = document.createElement('div');
-
-    // Image (conditional)
+  for (let i = 0; i < cardCount; i += 1) {
+    // Row (one per card)
+    const row = document.createElement('div');
+    
+    // Cell 1: Image (if hasImage)
     if (hasImage) {
+      const imageCell = document.createElement('div');
       const picture = document.createElement('picture');
       const img = document.createElement('img');
       img.src = cardImageUrl;
       img.alt = `Card ${i + 1}`;
       img.loading = 'eager';
       picture.appendChild(img);
-      const imgWrapper = document.createElement('div');
-      imgWrapper.appendChild(picture);
-      card.appendChild(imgWrapper);
+      imageCell.appendChild(picture);
+      row.appendChild(imageCell);
     }
 
-    const title = document.createElement('h3');
-    title.textContent = `Card Title ${i + 1}`;
-    card.appendChild(title);
+    // Cell 2 (or Cell 1 if no image): Content cell
+    const contentCell = document.createElement('div');
 
+    // Title - as <p><strong>Text</strong></p> (EDS standard)
+    const titlePara = document.createElement('p');
+    const strong = document.createElement('strong');
+    strong.textContent = `Card Title ${i + 1}`;
+    titlePara.appendChild(strong);
+    contentCell.appendChild(titlePara);
+
+    // Description
     const body = document.createElement('p');
     body.textContent = 'This is a description of the card content. It provides context and information.';
-    card.appendChild(body);
+    contentCell.appendChild(body);
 
     // CTA Link (conditional)
     if (hasLink) {
@@ -73,26 +99,63 @@ const createCardsBlock = ({
       cta.textContent = 'Learn More';
       if (isHover) cta.classList.add('hover');
       ctaPara.appendChild(cta);
-      card.appendChild(ctaPara);
+      contentCell.appendChild(ctaPara);
     }
 
-    block.appendChild(card);
+    row.appendChild(contentCell);
+    block.appendChild(row);
   }
 
   return block;
 };
 
+/**
+ * Template function
+ * Creates EDS page structure matching decorateSections() and decorateBlock() output
+ * 
+ * Complete hierarchy from localhost:3000:
+ * main
+ *   > div.section.highlight.cards-container[data-section-status="loaded"]
+ *       > div.default-content-wrapper
+ *       > div.cards-wrapper
+ *           > div.cards.block[data-block-name="cards"][data-block-status="loaded"]
+ * 
+ * Key transformations by aem.js:
+ * - decorateSections(): adds 'section', wrappers, processes metadata (highlight)
+ * - decorateBlock(): adds 'block', 'cards-wrapper', 'cards-container', data attributes
+ */
 const Template = (args) => {
   const main = document.createElement('main');
+  
+  // Section (base + metadata Style: highlight + cards-container from decorateBlock)
   const section = document.createElement('div');
-  section.className = 'section';
+  section.className = 'section highlight cards-container';
+  section.setAttribute('data-section-status', 'loaded');
 
-  const wrapper = document.createElement('div');
+  // Default content wrapper (for non-block content)
+  const defaultWrapper = document.createElement('div');
+  defaultWrapper.className = 'default-content-wrapper';
+  const heading = document.createElement('h2');
+  heading.textContent = 'Cards Showcase';
+  const desc = document.createElement('p');
+  desc.textContent = 'Grid of card items with responsive layout';
+  defaultWrapper.append(heading, desc);
+  
+  // Block wrapper (gets 'cards-wrapper' from decorateBlock)
+  const blockWrapper = document.createElement('div');
+  blockWrapper.className = 'cards-wrapper';
+  
+  // Block element (gets 'block' class and attributes from decorateBlock)
   const block = createCardsBlock(args);
-  wrapper.appendChild(block);
-  section.appendChild(wrapper);
+  block.classList.add('block');
+  block.setAttribute('data-block-name', 'cards');
+  block.setAttribute('data-block-status', 'loaded');
+  
+  blockWrapper.appendChild(block);
+  section.append(defaultWrapper, blockWrapper);
   main.appendChild(section);
 
+  // Decorate the block (this is what EDS does after loading)
   decorate(block);
 
   return main;

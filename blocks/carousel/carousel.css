@@ -1,102 +1,161 @@
 /**
  * Carousel Block Styles
+ * 
+ * Generated from Figma Component Set: 9392:122
+ * 
+ * Design Tokens Source:
+ * - Spacing: Extracted from Figma (40px padding, 32px-40px gaps)
+ * - Sizing: Component width 1160px, height responsive
+ * - Corner Radius: 5px (from Figma)
+ * - Colors: Using CSS variables from styles.css
+ * 
+ * Responsive Breakpoints:
+ * - Mobile: < 768px
+ * - Tablet: 768px - 1024px
+ * - Desktop: > 1024px
  */
 
+/* ===================================================================
+   Container & Base Structure
+   =================================================================== */
+
 .carousel {
-  max-width: 1200px;
-  padding: 40px 40px 40px 40px;
-  border-radius: 5px;
   position: relative;
   width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.carousel-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ===================================================================
+   Slides Wrapper
+   =================================================================== */
+
+.carousel-slides {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+/* ===================================================================
+   Individual Slides
+   =================================================================== */
+
+.carousel-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-slide--active {
+  position: relative;
+  opacity: 1;
+  visibility: visible;
+  z-index: 1;
+}
+
+/* ===================================================================
+   Slide Image
+   =================================================================== */
+
+.carousel-image {
+  width: 100%;
+  height: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel-image picture {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.carousel-image img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+/* ===================================================================
+   Slide Content
+   =================================================================== */
+
+.carousel-content {
+  padding: 32px;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Content Position Variants */
+.carousel-content--center {
+  align-items: center;
+  text-align: center;
+}
+
+.carousel-content--left {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.carousel-content--right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* Content Size Variants */
+.carousel-content--small {
+  max-width: 600px;
   margin: 0 auto;
 }
 
-/* Slides Container */
-.carousel .carousel-slides-container {
-  position: relative;
-  width: 100%;
+.carousel-content--full {
+  max-width: 100%;
 }
 
-.carousel .carousel-slides {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none; /* Firefox */
+.carousel-content h1,
+.carousel-content h2,
+.carousel-content h3,
+.carousel-content h4,
+.carousel-content h5,
+.carousel-content h6 {
+  margin: 0 0 16px;
 }
 
-.carousel .carousel-slides::-webkit-scrollbar {
-  display: none; /* Chrome, Safari */
+.carousel-content p {
+  margin: 0 0 16px;
 }
 
-/* Individual Slide */
-.carousel .carousel-slide {
-  flex: 0 0 100%;
-  min-width: 100%;
-  scroll-snap-align: start;
-  position: relative;
-  opacity: 0;
-  transition: opacity 0.3s ease-in-out;
+.carousel-content p:last-child {
+  margin-bottom: 0;
 }
 
-.carousel .carousel-slide.active {
-  opacity: 1;
-}
+/* ===================================================================
+   Navigation Buttons
+   =================================================================== */
 
-.carousel .carousel-slide-image {
-  width: 100%;
-  position: relative;
-}
-
-.carousel .carousel-slide-image picture {
-  display: block;
-  width: 100%;
-}
-
-.carousel .carousel-slide-image picture img {
-  width: 100%;
-  height: auto;
-  display: block;
-  object-fit: cover;
-}
-
-/* デスクトップ画像はデフォルトで表示 */
-.carousel .carousel-slide-image picture[data-viewport="desktop"] {
-  display: block;
-}
-
-.carousel .carousel-slide-image picture[data-viewport="mobile"] {
-  display: none;
-}
-
-/* モバイルでは mobile 画像を表示 */
-@media (max-width: 768px) {
-  .carousel .carousel-slide-image picture[data-viewport="desktop"] {
-    display: none;
-  }
-
-  .carousel .carousel-slide-image picture[data-viewport="mobile"] {
-    display: block;
-  }
-}
-
-/* 画像リンクホバー効果 */
-.carousel .carousel-slide-image a {
-  display: block;
-  transition: opacity 0.2s ease-in-out;
-}
-
-.carousel .carousel-slide-image a:hover img,
-.carousel .carousel-slide-image a:focus-visible img {
-  opacity: 0.85;
-}
-
-/* Navigation Buttons */
-.carousel .carousel-navigation-buttons {
+.carousel-navigation {
   position: absolute;
   top: 50%;
   left: 0;
@@ -106,153 +165,202 @@
   justify-content: space-between;
   pointer-events: none;
   z-index: 10;
-  padding: 0 var(--spacing-m, 16px);
+  padding: 0 16px;
 }
 
-.carousel .carousel-navigation-buttons button {
-  pointer-events: auto;
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
+.carousel-nav-button {
+  pointer-events: all;
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  font-size: 24px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: var(--text-color, #000);
+  font-size: 32px;
+  font-weight: bold;
   line-height: 1;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 200ms ease-in-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.carousel .carousel-navigation-buttons button:hover {
-  background: rgba(255, 255, 255, 1);
+.carousel-nav-button:hover {
+  background-color: rgba(255, 255, 255, 1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transform: scale(1.05);
 }
 
-.carousel .carousel-navigation-buttons button:focus-visible {
-  outline: 2px solid var(--link-color, #3b63fb);
-  outline-offset: 2px;
-}
-
-.carousel .carousel-navigation-buttons button:active {
+.carousel-nav-button:active {
   transform: scale(0.95);
 }
 
-/* Slide Indicators */
-.carousel .carousel-indicators-nav {
+.carousel-nav-button:focus-visible {
+  outline: 2px solid var(--primary-color, #0070f3);
+  outline-offset: 2px;
+}
+
+.carousel-nav-button span {
+  display: block;
+  line-height: 1;
+}
+
+/* ===================================================================
+   Indicators
+   =================================================================== */
+
+.carousel-indicators {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: var(--spacing-s, 12px);
-  margin-top: var(--spacing-m, 16px);
-  padding: var(--spacing-s, 12px) 0;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
 }
 
-.carousel .carousel-slide-indicators {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  gap: var(--spacing-xs, 8px);
-}
-
-.carousel .carousel-slide-indicator {
-  margin: 0;
-  padding: 0;
-}
-
-.carousel .carousel-slide-indicator button {
+.carousel-indicator {
   width: 12px;
   height: 12px;
   border-radius: 50%;
   border: none;
-  background: var(--light-color, #e0e0e0);
+  background-color: rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: all 200ms ease-in-out;
   padding: 0;
 }
 
-.carousel .carousel-slide-indicator button:hover {
-  background: var(--dark-color, #505050);
+.carousel-indicator:hover {
+  background-color: rgba(0, 0, 0, 0.5);
   transform: scale(1.2);
 }
 
-.carousel .carousel-slide-indicator button:focus-visible {
-  outline: 2px solid var(--link-color, #3b63fb);
-  outline-offset: 2px;
-}
-
-.carousel .carousel-slide-indicator.active button {
-  background: var(--link-color, #3b63fb);
+.carousel-indicator--active {
+  background-color: var(--primary-color, #0070f3);
   width: 32px;
   border-radius: 6px;
 }
 
-/* Play/Pause Button */
-.carousel .carousel-play-pause {
-  background: transparent;
-  border: 1px solid var(--dark-color, #505050);
-  border-radius: 4px;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 14px;
-  line-height: 1;
-  transition: all 0.2s ease-in-out;
-  color: var(--dark-color, #505050);
-}
-
-.carousel .carousel-play-pause:hover {
-  background: var(--light-color, #f8f8f8);
-  border-color: var(--link-color, #3b63fb);
-  color: var(--link-color, #3b63fb);
-}
-
-.carousel .carousel-play-pause:focus-visible {
-  outline: 2px solid var(--link-color, #3b63fb);
+.carousel-indicator:focus-visible {
+  outline: 2px solid var(--primary-color, #0070f3);
   outline-offset: 2px;
 }
 
-.carousel .carousel-play-pause.playing {
-  color: var(--link-color, #3b63fb);
-  border-color: var(--link-color, #3b63fb);
-}
+/* ===================================================================
+   Responsive Design
+   =================================================================== */
 
-/* Single Slide (no navigation) */
-.carousel:has(.carousel-slides > .carousel-slide:only-child) .carousel-navigation-buttons,
-.carousel:has(.carousel-slides > .carousel-slide:only-child) .carousel-indicators-nav {
-  display: none;
-}
-
-/* モバイル調整 */
-@media (max-width: 768px) {
-  .carousel .carousel-navigation-buttons {
-    padding: 0 var(--spacing-xs, 8px);
+/* Tablet */
+@media (max-width: 1024px) {
+  .carousel {
+    padding: 32px 0;
   }
 
-  .carousel .carousel-navigation-buttons button {
+  .carousel-content {
+    padding: 24px;
+  }
+
+  .carousel-navigation {
+    padding: 0 12px;
+  }
+
+  .carousel-nav-button {
     width: 40px;
     height: 40px;
-    font-size: 20px;
-  }
-
-  .carousel .carousel-indicators-nav {
-    margin-top: var(--spacing-s, 12px);
+    font-size: 28px;
   }
 }
 
-/* アクセシビリティ: 非表示スライドはキーボードフォーカス不可 */
-.carousel .carousel-slide[aria-hidden="true"] {
-  pointer-events: none;
+/* Mobile */
+@media (max-width: 768px) {
+  .carousel {
+    padding: 24px 0;
+  }
+
+  .carousel-content {
+    padding: 20px;
+  }
+
+  .carousel-content--small {
+    max-width: 100%;
+  }
+
+  .carousel-navigation {
+    padding: 0 8px;
+  }
+
+  .carousel-nav-button {
+    width: 36px;
+    height: 36px;
+    font-size: 24px;
+  }
+
+  .carousel-indicators {
+    gap: 8px;
+    padding: 12px 0;
+  }
+
+  .carousel-indicator {
+    width: 10px;
+    height: 10px;
+  }
+
+  .carousel-indicator--active {
+    width: 24px;
+  }
 }
 
-.carousel .carousel-slide[aria-hidden="true"] a,
-.carousel .carousel-slide[aria-hidden="true"] button {
-  tabindex: -1;
+/* ===================================================================
+   Accessibility & Print
+   =================================================================== */
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .carousel-slide {
+    transition: none;
+  }
+
+  .carousel-nav-button,
+  .carousel-indicator {
+    transition: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .carousel-navigation,
+  .carousel-indicators {
+    display: none;
+  }
+
+  .carousel-slide {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    page-break-inside: avoid;
+    margin-bottom: 20px;
+  }
+}
+
+/* ===================================================================
+   Dark Mode Support (if applicable)
+   =================================================================== */
+
+@media (prefers-color-scheme: dark) {
+  .carousel-nav-button {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+  }
+
+  .carousel-nav-button:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+  }
+
+  .carousel-indicator {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .carousel-indicator:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
 }

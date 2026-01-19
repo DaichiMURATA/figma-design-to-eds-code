@@ -1,26 +1,55 @@
 {
-  "nodeName": "isSingle=false, isMultiple=true, isContent=false, contentPosition=none, contentSize=none",
-  "nodeType": "COMPONENT",
+  "nodeName": "Carousel",
+  "nodeType": "COMPONENT_SET",
   "styles": {
     "layout": {
       "display": "flex",
       "flex-direction": "column",
-      "align-items": "center"
+      "gap": "40px"
     },
     "sizing": {
-      "width": 1160,
-      "height": 639
+      "width": 1240,
+      "height": 4070
+    },
+    "spacing": {
+      "paddingTop": 40,
+      "paddingRight": 40,
+      "paddingBottom": 40,
+      "paddingLeft": 40
+    },
+    "spacingTokens": {
+      "paddingTop": null,
+      "paddingRight": null,
+      "paddingBottom": null,
+      "paddingLeft": null
+    },
+    "spacingSource": {
+      "paddingTop": "value-match",
+      "paddingRight": "value-match",
+      "paddingBottom": "value-match",
+      "paddingLeft": "value-match"
+    },
+    "stroke": {
+      "type": "solid",
+      "color": "rgb(151, 71, 255)",
+      "strokeWeight": 1,
+      "token": null,
+      "source": "value-match"
+    },
+    "cornerRadius": {
+      "value": 5,
+      "token": null,
+      "source": "value-match"
     }
   },
   "children": [
     {
-      "nodeName": "slider",
-      "nodeType": "FRAME",
+      "nodeName": "isSingle=true, isMultiple=false, isContent=true, contentPosition=center, contentSize=full",
+      "nodeType": "COMPONENT",
       "styles": {
         "layout": {
           "display": "flex",
           "flex-direction": "column",
-          "justify-content": "center",
           "align-items": "center"
         },
         "sizing": {
@@ -30,18 +59,24 @@
       },
       "children": [
         {
-          "nodeName": "image",
+          "nodeName": "slider",
           "nodeType": "FRAME",
           "styles": {
+            "layout": {
+              "display": "flex",
+              "flex-direction": "column",
+              "justify-content": "center",
+              "align-items": "center"
+            },
             "sizing": {
-              "width": 1200,
-              "height": 640
+              "width": 1160,
+              "height": 595
             }
           },
           "children": [
             {
               "nodeName": "image",
-              "nodeType": "RECTANGLE",
+              "nodeType": "FRAME",
               "styles": {
                 "sizing": {
                   "width": 1200,
@@ -49,72 +84,38 @@
                 }
               },
               "children": []
-            }
-          ]
-        },
-        {
-          "nodeName": "contents",
-          "nodeType": "FRAME",
-          "styles": {
-            "layout": {
-              "display": "flex",
-              "flex-direction": "row",
-              "justify-content": "space-between",
-              "align-items": "center",
-              "gap": "32px"
             },
-            "sizing": {
-              "width": 1160,
-              "height": 595
-            },
-            "spacing": {
-              "paddingTop": 0,
-              "paddingRight": 12,
-              "paddingBottom": 0,
-              "paddingLeft": 12
-            },
-            "spacingTokens": {
-              "paddingTop": null,
-              "paddingRight": null,
-              "paddingBottom": null,
-              "paddingLeft": null
-            },
-            "spacingSource": {
-              "paddingTop": "value-match",
-              "paddingRight": "figma-variable",
-              "paddingBottom": "value-match",
-              "paddingLeft": "figma-variable"
-            }
-          },
-          "children": [
             {
-              "nodeName": "left-icon",
+              "nodeName": "contents",
               "nodeType": "FRAME",
               "styles": {
                 "layout": {
                   "display": "flex",
-                  "flex-direction": "column",
-                  "justify-content": "center"
+                  "flex-direction": "row",
+                  "align-items": "center",
+                  "gap": "32px"
                 },
                 "sizing": {
-                  "width": 49.95912170410156,
+                  "width": 1160,
                   "height": 595
-                }
-              },
-              "children": []
-            },
-            {
-              "nodeName": "right-icon",
-              "nodeType": "FRAME",
-              "styles": {
-                "layout": {
-                  "display": "flex",
-                  "flex-direction": "column",
-                  "justify-content": "center"
                 },
-                "sizing": {
-                  "width": 50,
-                  "height": 595
+                "spacing": {
+                  "paddingTop": 0,
+                  "paddingRight": 12,
+                  "paddingBottom": 0,
+                  "paddingLeft": 12
+                },
+                "spacingTokens": {
+                  "paddingTop": null,
+                  "paddingRight": null,
+                  "paddingBottom": null,
+                  "paddingLeft": null
+                },
+                "spacingSource": {
+                  "paddingTop": "value-match",
+                  "paddingRight": "figma-variable",
+                  "paddingBottom": "value-match",
+                  "paddingLeft": "figma-variable"
                 }
               },
               "children": []
@@ -124,67 +125,79 @@
       ]
     },
     {
-      "nodeName": "indicators",
-      "nodeType": "FRAME",
+      "nodeName": "isSingle=false, isMultiple=true, isContent=false, contentPosition=none, contentSize=none",
+      "nodeType": "COMPONENT",
       "styles": {
         "layout": {
           "display": "flex",
-          "flex-direction": "row",
-          "align-items": "center",
-          "gap": "8px"
+          "flex-direction": "column",
+          "align-items": "center"
         },
         "sizing": {
-          "width": 132,
-          "height": 44
-        },
-        "spacing": {
-          "paddingTop": 12,
-          "paddingRight": 0,
-          "paddingBottom": 12,
-          "paddingLeft": 0
-        },
-        "spacingTokens": {
-          "paddingTop": null,
-          "paddingRight": null,
-          "paddingBottom": null,
-          "paddingLeft": null
-        },
-        "spacingSource": {
-          "paddingTop": "figma-variable",
-          "paddingRight": "value-match",
-          "paddingBottom": "figma-variable",
-          "paddingLeft": "value-match"
+          "width": 1160,
+          "height": 639
         }
       },
       "children": [
         {
-          "nodeName": "indicator",
-          "nodeType": "INSTANCE",
+          "nodeName": "slider",
+          "nodeType": "FRAME",
           "styles": {
-            "sizing": {
-              "width": 20,
-              "height": 20
+            "layout": {
+              "display": "flex",
+              "flex-direction": "column",
+              "justify-content": "center",
+              "align-items": "center"
             },
-            "cornerRadius": {
-              "value": 999,
-              "token": null,
-              "source": "value-match"
+            "sizing": {
+              "width": 1160,
+              "height": 595
             }
           },
           "children": [
             {
-              "nodeName": "●",
-              "nodeType": "VECTOR",
+              "nodeName": "image",
+              "nodeType": "FRAME",
               "styles": {
                 "sizing": {
-                  "width": 16,
-                  "height": 16
+                  "width": 1200,
+                  "height": 640
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "contents",
+              "nodeType": "FRAME",
+              "styles": {
+                "layout": {
+                  "display": "flex",
+                  "flex-direction": "row",
+                  "justify-content": "space-between",
+                  "align-items": "center",
+                  "gap": "32px"
                 },
-                "fill": {
-                  "type": "solid",
-                  "color": "rgb(17, 17, 17)",
-                  "token": null,
-                  "source": "figma-variable"
+                "sizing": {
+                  "width": 1160,
+                  "height": 595
+                },
+                "spacing": {
+                  "paddingTop": 0,
+                  "paddingRight": 12,
+                  "paddingBottom": 0,
+                  "paddingLeft": 12
+                },
+                "spacingTokens": {
+                  "paddingTop": null,
+                  "paddingRight": null,
+                  "paddingBottom": null,
+                  "paddingLeft": null
+                },
+                "spacingSource": {
+                  "paddingTop": "value-match",
+                  "paddingRight": "figma-variable",
+                  "paddingBottom": "value-match",
+                  "paddingLeft": "figma-variable"
                 }
               },
               "children": []
@@ -192,33 +205,196 @@
           ]
         },
         {
-          "nodeName": "indicator",
-          "nodeType": "INSTANCE",
+          "nodeName": "indicators",
+          "nodeType": "FRAME",
           "styles": {
-            "sizing": {
-              "width": 20,
-              "height": 20
+            "layout": {
+              "display": "flex",
+              "flex-direction": "row",
+              "align-items": "center",
+              "gap": "8px"
             },
-            "cornerRadius": {
-              "value": 999,
-              "token": null,
-              "source": "value-match"
+            "sizing": {
+              "width": 132,
+              "height": 44
+            },
+            "spacing": {
+              "paddingTop": 12,
+              "paddingRight": 0,
+              "paddingBottom": 12,
+              "paddingLeft": 0
+            },
+            "spacingTokens": {
+              "paddingTop": null,
+              "paddingRight": null,
+              "paddingBottom": null,
+              "paddingLeft": null
+            },
+            "spacingSource": {
+              "paddingTop": "figma-variable",
+              "paddingRight": "value-match",
+              "paddingBottom": "figma-variable",
+              "paddingLeft": "value-match"
             }
           },
           "children": [
             {
-              "nodeName": "●",
-              "nodeType": "VECTOR",
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
               "styles": {
                 "sizing": {
-                  "width": 16,
-                  "height": 16
+                  "width": 20,
+                  "height": 20
                 },
-                "fill": {
-                  "type": "solid",
-                  "color": "rgb(224, 224, 224)",
+                "cornerRadius": {
+                  "value": 999,
                   "token": null,
-                  "source": "figma-variable"
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nodeName": "isSingle=false, isMultiple=true, isContent=true, contentPosition=center, contentSize=small",
+      "nodeType": "COMPONENT",
+      "styles": {
+        "layout": {
+          "display": "flex",
+          "flex-direction": "column",
+          "align-items": "center"
+        },
+        "sizing": {
+          "width": 1160,
+          "height": 639
+        }
+      },
+      "children": [
+        {
+          "nodeName": "slider",
+          "nodeType": "FRAME",
+          "styles": {
+            "layout": {
+              "display": "flex",
+              "flex-direction": "column",
+              "justify-content": "center",
+              "align-items": "center"
+            },
+            "sizing": {
+              "width": 1160,
+              "height": 595
+            }
+          },
+          "children": [
+            {
+              "nodeName": "image",
+              "nodeType": "FRAME",
+              "styles": {
+                "sizing": {
+                  "width": 1200,
+                  "height": 640
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "contents",
+              "nodeType": "FRAME",
+              "styles": {
+                "layout": {
+                  "display": "flex",
+                  "flex-direction": "row",
+                  "align-items": "center",
+                  "gap": "32px"
+                },
+                "sizing": {
+                  "width": 1160,
+                  "height": 595
+                },
+                "spacing": {
+                  "paddingTop": 0,
+                  "paddingRight": 12,
+                  "paddingBottom": 0,
+                  "paddingLeft": 12
+                },
+                "spacingTokens": {
+                  "paddingTop": null,
+                  "paddingRight": null,
+                  "paddingBottom": null,
+                  "paddingLeft": null
+                },
+                "spacingSource": {
+                  "paddingTop": "value-match",
+                  "paddingRight": "figma-variable",
+                  "paddingBottom": "value-match",
+                  "paddingLeft": "figma-variable"
                 }
               },
               "children": []
@@ -226,33 +402,196 @@
           ]
         },
         {
-          "nodeName": "indicator",
-          "nodeType": "INSTANCE",
+          "nodeName": "indicators",
+          "nodeType": "FRAME",
           "styles": {
-            "sizing": {
-              "width": 20,
-              "height": 20
+            "layout": {
+              "display": "flex",
+              "flex-direction": "row",
+              "align-items": "center",
+              "gap": "8px"
             },
-            "cornerRadius": {
-              "value": 999,
-              "token": null,
-              "source": "value-match"
+            "sizing": {
+              "width": 132,
+              "height": 44
+            },
+            "spacing": {
+              "paddingTop": 12,
+              "paddingRight": 0,
+              "paddingBottom": 12,
+              "paddingLeft": 0
+            },
+            "spacingTokens": {
+              "paddingTop": null,
+              "paddingRight": null,
+              "paddingBottom": null,
+              "paddingLeft": null
+            },
+            "spacingSource": {
+              "paddingTop": "figma-variable",
+              "paddingRight": "value-match",
+              "paddingBottom": "figma-variable",
+              "paddingLeft": "value-match"
             }
           },
           "children": [
             {
-              "nodeName": "●",
-              "nodeType": "VECTOR",
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
               "styles": {
                 "sizing": {
-                  "width": 16,
-                  "height": 16
+                  "width": 20,
+                  "height": 20
                 },
-                "fill": {
-                  "type": "solid",
-                  "color": "rgb(224, 224, 224)",
+                "cornerRadius": {
+                  "value": 999,
                   "token": null,
-                  "source": "figma-variable"
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nodeName": "isSingle=false, isMultiple=true, isContent=true, contentPosition=right, contentSize=small",
+      "nodeType": "COMPONENT",
+      "styles": {
+        "layout": {
+          "display": "flex",
+          "flex-direction": "column",
+          "align-items": "center"
+        },
+        "sizing": {
+          "width": 1160,
+          "height": 639
+        }
+      },
+      "children": [
+        {
+          "nodeName": "slider",
+          "nodeType": "FRAME",
+          "styles": {
+            "layout": {
+              "display": "flex",
+              "flex-direction": "column",
+              "justify-content": "center",
+              "align-items": "center"
+            },
+            "sizing": {
+              "width": 1160,
+              "height": 595
+            }
+          },
+          "children": [
+            {
+              "nodeName": "image",
+              "nodeType": "FRAME",
+              "styles": {
+                "sizing": {
+                  "width": 1200,
+                  "height": 640
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "contents",
+              "nodeType": "FRAME",
+              "styles": {
+                "layout": {
+                  "display": "flex",
+                  "flex-direction": "row",
+                  "align-items": "center",
+                  "gap": "32px"
+                },
+                "sizing": {
+                  "width": 1160,
+                  "height": 595
+                },
+                "spacing": {
+                  "paddingTop": 0,
+                  "paddingRight": 12,
+                  "paddingBottom": 0,
+                  "paddingLeft": 12
+                },
+                "spacingTokens": {
+                  "paddingTop": null,
+                  "paddingRight": null,
+                  "paddingBottom": null,
+                  "paddingLeft": null
+                },
+                "spacingSource": {
+                  "paddingTop": "value-match",
+                  "paddingRight": "figma-variable",
+                  "paddingBottom": "value-match",
+                  "paddingLeft": "figma-variable"
                 }
               },
               "children": []
@@ -260,33 +599,196 @@
           ]
         },
         {
-          "nodeName": "indicator",
-          "nodeType": "INSTANCE",
+          "nodeName": "indicators",
+          "nodeType": "FRAME",
           "styles": {
-            "sizing": {
-              "width": 20,
-              "height": 20
+            "layout": {
+              "display": "flex",
+              "flex-direction": "row",
+              "align-items": "center",
+              "gap": "8px"
             },
-            "cornerRadius": {
-              "value": 999,
-              "token": null,
-              "source": "value-match"
+            "sizing": {
+              "width": 132,
+              "height": 44
+            },
+            "spacing": {
+              "paddingTop": 12,
+              "paddingRight": 0,
+              "paddingBottom": 12,
+              "paddingLeft": 0
+            },
+            "spacingTokens": {
+              "paddingTop": null,
+              "paddingRight": null,
+              "paddingBottom": null,
+              "paddingLeft": null
+            },
+            "spacingSource": {
+              "paddingTop": "figma-variable",
+              "paddingRight": "value-match",
+              "paddingBottom": "figma-variable",
+              "paddingLeft": "value-match"
             }
           },
           "children": [
             {
-              "nodeName": "●",
-              "nodeType": "VECTOR",
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
               "styles": {
                 "sizing": {
-                  "width": 16,
-                  "height": 16
+                  "width": 20,
+                  "height": 20
                 },
-                "fill": {
-                  "type": "solid",
-                  "color": "rgb(224, 224, 224)",
+                "cornerRadius": {
+                  "value": 999,
                   "token": null,
-                  "source": "figma-variable"
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nodeName": "isSingle=false, isMultiple=true, isContent=true, contentPosition=left, contentSize=small",
+      "nodeType": "COMPONENT",
+      "styles": {
+        "layout": {
+          "display": "flex",
+          "flex-direction": "column",
+          "align-items": "center"
+        },
+        "sizing": {
+          "width": 1160,
+          "height": 639
+        }
+      },
+      "children": [
+        {
+          "nodeName": "slider",
+          "nodeType": "FRAME",
+          "styles": {
+            "layout": {
+              "display": "flex",
+              "flex-direction": "column",
+              "justify-content": "center",
+              "align-items": "center"
+            },
+            "sizing": {
+              "width": 1160,
+              "height": 595
+            }
+          },
+          "children": [
+            {
+              "nodeName": "image",
+              "nodeType": "FRAME",
+              "styles": {
+                "sizing": {
+                  "width": 1200,
+                  "height": 640
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "contents",
+              "nodeType": "FRAME",
+              "styles": {
+                "layout": {
+                  "display": "flex",
+                  "flex-direction": "row",
+                  "align-items": "center",
+                  "gap": "32px"
+                },
+                "sizing": {
+                  "width": 1160,
+                  "height": 595
+                },
+                "spacing": {
+                  "paddingTop": 0,
+                  "paddingRight": 12,
+                  "paddingBottom": 0,
+                  "paddingLeft": 12
+                },
+                "spacingTokens": {
+                  "paddingTop": null,
+                  "paddingRight": null,
+                  "paddingBottom": null,
+                  "paddingLeft": null
+                },
+                "spacingSource": {
+                  "paddingTop": "value-match",
+                  "paddingRight": "figma-variable",
+                  "paddingBottom": "value-match",
+                  "paddingLeft": "figma-variable"
                 }
               },
               "children": []
@@ -294,33 +796,312 @@
           ]
         },
         {
-          "nodeName": "indicator",
-          "nodeType": "INSTANCE",
+          "nodeName": "indicators",
+          "nodeType": "FRAME",
           "styles": {
-            "sizing": {
-              "width": 20,
-              "height": 20
+            "layout": {
+              "display": "flex",
+              "flex-direction": "row",
+              "align-items": "center",
+              "gap": "8px"
             },
-            "cornerRadius": {
-              "value": 999,
-              "token": null,
-              "source": "value-match"
+            "sizing": {
+              "width": 132,
+              "height": 44
+            },
+            "spacing": {
+              "paddingTop": 12,
+              "paddingRight": 0,
+              "paddingBottom": 12,
+              "paddingLeft": 0
+            },
+            "spacingTokens": {
+              "paddingTop": null,
+              "paddingRight": null,
+              "paddingBottom": null,
+              "paddingLeft": null
+            },
+            "spacingSource": {
+              "paddingTop": "figma-variable",
+              "paddingRight": "value-match",
+              "paddingBottom": "figma-variable",
+              "paddingLeft": "value-match"
             }
           },
           "children": [
             {
-              "nodeName": "●",
-              "nodeType": "VECTOR",
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
               "styles": {
                 "sizing": {
-                  "width": 16,
-                  "height": 16
+                  "width": 20,
+                  "height": 20
                 },
-                "fill": {
-                  "type": "solid",
-                  "color": "rgb(224, 224, 224)",
+                "cornerRadius": {
+                  "value": 999,
                   "token": null,
-                  "source": "figma-variable"
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nodeName": "isSingle=false, isMultiple=true, isContent=true, contentPosition=center, contentSize=full",
+      "nodeType": "COMPONENT",
+      "styles": {
+        "layout": {
+          "display": "flex",
+          "flex-direction": "column",
+          "align-items": "center"
+        },
+        "sizing": {
+          "width": 1160,
+          "height": 639
+        }
+      },
+      "children": [
+        {
+          "nodeName": "slider",
+          "nodeType": "FRAME",
+          "styles": {
+            "layout": {
+              "display": "flex",
+              "flex-direction": "column",
+              "justify-content": "center",
+              "align-items": "center"
+            },
+            "sizing": {
+              "width": 1160,
+              "height": 595
+            }
+          },
+          "children": [
+            {
+              "nodeName": "image",
+              "nodeType": "FRAME",
+              "styles": {
+                "sizing": {
+                  "width": 1200,
+                  "height": 640
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "contents",
+              "nodeType": "FRAME",
+              "styles": {
+                "layout": {
+                  "display": "flex",
+                  "flex-direction": "row",
+                  "align-items": "center",
+                  "gap": "32px"
+                },
+                "sizing": {
+                  "width": 1160,
+                  "height": 595
+                },
+                "spacing": {
+                  "paddingTop": 0,
+                  "paddingRight": 12,
+                  "paddingBottom": 0,
+                  "paddingLeft": 12
+                },
+                "spacingTokens": {
+                  "paddingTop": null,
+                  "paddingRight": null,
+                  "paddingBottom": null,
+                  "paddingLeft": null
+                },
+                "spacingSource": {
+                  "paddingTop": "value-match",
+                  "paddingRight": "figma-variable",
+                  "paddingBottom": "value-match",
+                  "paddingLeft": "figma-variable"
+                }
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "nodeName": "indicators",
+          "nodeType": "FRAME",
+          "styles": {
+            "layout": {
+              "display": "flex",
+              "flex-direction": "row",
+              "align-items": "center",
+              "gap": "8px"
+            },
+            "sizing": {
+              "width": 132,
+              "height": 44
+            },
+            "spacing": {
+              "paddingTop": 12,
+              "paddingRight": 0,
+              "paddingBottom": 12,
+              "paddingLeft": 0
+            },
+            "spacingTokens": {
+              "paddingTop": null,
+              "paddingRight": null,
+              "paddingBottom": null,
+              "paddingLeft": null
+            },
+            "spacingSource": {
+              "paddingTop": "figma-variable",
+              "paddingRight": "value-match",
+              "paddingBottom": "figma-variable",
+              "paddingLeft": "value-match"
+            }
+          },
+          "children": [
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
+                }
+              },
+              "children": []
+            },
+            {
+              "nodeName": "indicator",
+              "nodeType": "INSTANCE",
+              "styles": {
+                "sizing": {
+                  "width": 20,
+                  "height": 20
+                },
+                "cornerRadius": {
+                  "value": 999,
+                  "token": null,
+                  "source": "value-match"
                 }
               },
               "children": []
