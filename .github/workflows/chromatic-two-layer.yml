@@ -119,15 +119,30 @@ jobs:
         run: |
           echo "📊 Parsing Chromatic output for visual changes..."
           
-          # Extract visual changes count
-          CHANGES=$(grep -oP '(\d+)\s+change' chromatic-storybook-output.txt | grep -oP '\d+' | head -1 || echo "0")
-          STORIES_CHANGED=$(grep -oP '(\d+)\s+stor(?:y|ies)\s+with\s+changes' chromatic-storybook-output.txt | grep -oP '\d+' | head -1 || echo "0")
+          cat chromatic-storybook-output.txt
           
-          # Use whichever is greater
-          if [ "$STORIES_CHANGED" -gt "$CHANGES" ]; then
-            CHANGES=$STORIES_CHANGED
-          fi
+          # Try multiple patterns to extract changes count
+          CHANGES=0
           
+          # Pattern 1: "X changes detected" or "X change detected"
+          PATTERN1=$(grep -oiP '\d+\s+changes?\s+(detected|found)' chromatic-storybook-output.txt | grep -oP '^\d+' | head -1 || echo "0")
+          
+          # Pattern 2: "X stories with changes" or "X story with changes"
+          PATTERN2=$(grep -oiP '\d+\s+stor(?:y|ies)\s+with\s+changes?' chromatic-storybook-output.txt | grep -oP '^\d+' | head -1 || echo "0")
+          
+          # Pattern 3: Just "X change" or "X changes" (more generic)
+          PATTERN3=$(grep -oiP '\d+\s+changes?' chromatic-storybook-output.txt | grep -oP '^\d+' | head -1 || echo "0")
+          
+          # Pattern 4: Check for "unreviewed" or "pending" changes
+          PATTERN4=$(grep -oiP '\d+\s+(?:unreviewed|pending)' chromatic-storybook-output.txt | grep -oP '^\d+' | head -1 || echo "0")
+          
+          # Use the maximum value found
+          CHANGES=$PATTERN1
+          [ "$PATTERN2" -gt "$CHANGES" ] && CHANGES=$PATTERN2
+          [ "$PATTERN3" -gt "$CHANGES" ] && CHANGES=$PATTERN3
+          [ "$PATTERN4" -gt "$CHANGES" ] && CHANGES=$PATTERN4
+          
+          echo "📊 Pattern results: P1=$PATTERN1, P2=$PATTERN2, P3=$PATTERN3, P4=$PATTERN4"
           echo "visual_changes=${CHANGES}" >> $GITHUB_OUTPUT
           echo "✅ Visual changes detected: ${CHANGES}"
       
@@ -303,15 +318,30 @@ jobs:
         run: |
           echo "📊 Parsing Chromatic output for visual changes (Playwright)..."
           
-          # Extract visual changes count
-          CHANGES=$(grep -oP '(\d+)\s+change' chromatic-output.txt | grep -oP '\d+' | head -1 || echo "0")
-          SNAPSHOTS_CHANGED=$(grep -oP '(\d+)\s+snapshot(?:s)?\s+with\s+changes' chromatic-output.txt | grep -oP '\d+' | head -1 || echo "0")
+          cat chromatic-output.txt
           
-          # Use whichever is greater
-          if [ "$SNAPSHOTS_CHANGED" -gt "$CHANGES" ]; then
-            CHANGES=$SNAPSHOTS_CHANGED
-          fi
+          # Try multiple patterns to extract changes count
+          CHANGES=0
           
+          # Pattern 1: "X changes detected" or "X change detected"
+          PATTERN1=$(grep -oiP '\d+\s+changes?\s+(detected|found)' chromatic-output.txt | grep -oP '^\d+' | head -1 || echo "0")
+          
+          # Pattern 2: "X snapshots with changes" or "X snapshot with changes"
+          PATTERN2=$(grep -oiP '\d+\s+snapshots?\s+with\s+changes?' chromatic-output.txt | grep -oP '^\d+' | head -1 || echo "0")
+          
+          # Pattern 3: Just "X change" or "X changes" (more generic)
+          PATTERN3=$(grep -oiP '\d+\s+changes?' chromatic-output.txt | grep -oP '^\d+' | head -1 || echo "0")
+          
+          # Pattern 4: Check for "unreviewed" or "pending" changes
+          PATTERN4=$(grep -oiP '\d+\s+(?:unreviewed|pending)' chromatic-output.txt | grep -oP '^\d+' | head -1 || echo "0")
+          
+          # Use the maximum value found
+          CHANGES=$PATTERN1
+          [ "$PATTERN2" -gt "$CHANGES" ] && CHANGES=$PATTERN2
+          [ "$PATTERN3" -gt "$CHANGES" ] && CHANGES=$PATTERN3
+          [ "$PATTERN4" -gt "$CHANGES" ] && CHANGES=$PATTERN4
+          
+          echo "📊 Pattern results: P1=$PATTERN1, P2=$PATTERN2, P3=$PATTERN3, P4=$PATTERN4"
           echo "visual_changes=${CHANGES}" >> $GITHUB_OUTPUT
           echo "✅ Visual changes detected: ${CHANGES}"
       
